@@ -267,6 +267,9 @@ function minMaxSliderHandler(map) {
   ];
 
   map.setFilter("walls", filterExpression);
+  console.log(
+    map.querySourceFeatures("wallsSource", { filter: filterExpression })
+  );
 }
 
 function fillDualSliderColour(slider1, slider2, sliderTrack, maxValue) {

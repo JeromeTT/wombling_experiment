@@ -16,7 +16,7 @@ import {
   getVariableWidthExpression,
 } from "./expressions.js";
 import { getSelectValues } from "./variableOptions.js";
-
+import { barChart } from "./interface/distribution.js";
 /**
  * OLD IMPLEMENTATION
  * Draws the heights of the edges based on their womble values.
@@ -269,6 +269,7 @@ export function addWallsLayer(map) {
  */
 function generateWombleFeaturesData(source) {
   let edges = source["features"]; // get all edges from the source into one array
+
   let rawWombleValues = [];
   let maxWomble = 0; // used to calculate womble_scaled
 
@@ -295,7 +296,8 @@ function generateWombleFeaturesData(source) {
     type: "FeatureCollection",
     features: [],
   };
-
+  console.log(rawWombleValues);
+  barChart(rawWombleValues, ".dual-slider-overview");
   // add each edge that has a non-zero womble value to the walls source data
   for (let i = 0; i < edges.length; i++) {
     let edge = JSON.parse(JSON.stringify(edges[i])); // deep copying the edge so the original source is not modified
@@ -305,7 +307,7 @@ function generateWombleFeaturesData(source) {
       wombleFeaturesData.features.push(edge);
     }
   }
-
+  console.log("Feature Data?", wombleFeaturesData);
   return wombleFeaturesData;
 }
 
@@ -327,7 +329,7 @@ function calculateWomble(edge) {
 
   let womble = 0;
 
-  // find the elements in the indicators csv array that corresponds to the edges neighbouring areas
+  // Find the elements in the indicators csv array that corresponds to the edges neighbouring areas
   let area1 = indicatorsData.find(
     (area) => area[csvAreaCode] == edge["properties"]["sa1_id1"] // TODO: will have to update area code name, hardcoded to sa1_id1 for now
   );
@@ -368,6 +370,10 @@ function calculateWomble(edge) {
       return null;
     }
 
+    if (document.getElementById("normalize-checkbox").checked) {
+      womble += indicatorWeights[i] * Math.abs(edge[selectedIndicators[i]]);
+      continue;
+    }
     // womble += indicatorWeights[i] * absolute difference of (area1's selectedIndicator[i] value and area2's selectedIndicator[i] value)
     if (isDistanceWeighted()) {
       womble +=
@@ -386,7 +392,6 @@ function calculateWomble(edge) {
         );
     }
   }
-
   return womble;
 }
 

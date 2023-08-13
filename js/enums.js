@@ -7,3 +7,7 @@ export const LightModes = {
   LIGHT: "light",
   DARK: "dark",
 };
+
+export const DEFAULT = {
+  SCALESECTIONS: 5,
+};

@@ -1,184 +1,284 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Wombling Project</title>
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css" rel="stylesheet">
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.11.0/mapbox-gl.js"></script>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="index.css">
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="index.css" />
     <!-- <link rel="stylesheet" type="text/css" href="css/radio.css"> -->
- 
+
     <!-- <link rel="stylesheet" type="text/css" href="css/checkbox.css"> -->
-    
-    
-</head>
+  </head>
 
-
-<body>
+  <body>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <!-- Map goes in here -->
     <div id="map"></div>
     <div class="map-overlay top">
-        <button id="menu-collapsible" class="collapsible">Menu</button>
-        <div id="menu-contents" class="map-overlay-inner" style="overflow-y:auto;">
-            <!-- <label for="areasSelect">Select an area type:</label> -->
+      <button id="menu-collapsible" class="collapsible">Menu</button>
+      <div
+        id="menu-contents"
+        class="map-overlay-inner"
+        style="overflow-y: auto"
+      >
+        <!-- <label for="areasSelect">Select an area type:</label> -->
 
-            <select name="areasSelect" id="areasSelect" class="dropdown-large">
-                <option value="sa1_2011">SA1 2011</option>
-                <option value="sa1_2016" selected>SA1 2016</option>
-            </select>
-            <br>
-            <br>
-  
+        <select name="areasSelect" id="areasSelect" class="dropdown-large">
+          <option value="sa1_2011">SA1 2011</option>
+          <option value="sa1_2016" selected>SA1 2016</option>
+        </select>
+        <br />
+        <br />
 
-            <div class="block">
-                <label for="csvInput" class="custom-file-upload btn">
-                    Choose a CSV file to upload.
-                </label>
-                <br>
-                <span id="custom-text" class="file-upload-tooltip"> No file chosen, yet. &#x1F6C8;
-                    <span class="mytooltiptext">The first column must contain area codes. All other columns must contain variable data.</span>
-                </span>
-                <input type="file" id="csvInput" accept=".csv" />
+        <div class="block">
+          <label for="csvInput" class="custom-file-upload btn">
+            Choose a CSV file to upload.
+          </label>
+          <br />
+          <span id="custom-text" class="file-upload-tooltip">
+            No file chosen, yet. &#x1F6C8;
+            <span class="mytooltiptext"
+              >The first column must contain area codes. All other columns must
+              contain variable data.</span
+            >
+          </span>
+          <input type="file" id="csvInput" accept=".csv" />
+        </div>
+        <hr />
+        <div id="selectionBlock">
+          <span class="indicator-options-tooltip">
+            <h5>Womble Indicator Options &#x1F6C8;</h5>
+            <span class="mytooltiptext"
+              >Womble indicator options will only take effect upon clicking
+              "Run".</span
+            >
+          </span>
+
+          <h6>Select Womble Indicators:</h6>
+
+          <div id="options"></div>
+          <!-- This div contains the reset and run buttons for the indicator sliders. Initially hidden until the user selects their indicators -->
+          <div id="womble-indicators-buttons" class="hide">
+            <div class="womble-indicators-buttons-container">
+              <hr />
+              <label class="checkbox-container" for="distance-weight-checkbox"
+                >Distance Weight
+                <input type="checkbox" id="distance-weight-checkbox" />
+                <span class="checkmark"></span>
+              </label>
+
+              <label class="checkbox-container" for="normalize-checkbox"
+                >Normalise
+                <input type="checkbox" id="normalize-checkbox" />
+                <span class="checkmark"></span>
+              </label>
+
+              <br />
+              <button
+                id="reset-weights-button"
+                class="womble-indicators-button"
+              >
+                Reset Weights
+              </button>
+              <button id="run-womble-button" class="womble-indicators-button">
+                Run
+              </button>
             </div>
-            <hr>
-            <div id="selectionBlock">
-                <span class="indicator-options-tooltip">
-                    <h5>Womble Indicator Options &#x1F6C8;</h5> 
-                    <span class="mytooltiptext">Womble indicator options will only take effect upon clicking "Run".</span>
-                </span>
-                
-                <h6>Select Womble Indicators:</h6>
-               
-                <div id="options"></div>
-                 <!-- This div contains the reset and run buttons for the indicator sliders. Initially hidden until the user selects their indicators -->
-                <div id="womble-indicators-buttons" class="hide">
-                    <div class="womble-indicators-buttons-container">
-                        <hr>
-                        <label class="checkbox-container" for="distance-weight-checkbox">Distance Weight
-                            <input type="checkbox" id="distance-weight-checkbox">
-                            <span class="checkmark"></span>
-                        </label>
-                        <br>
-                        <button id="reset-weights-button" class="womble-indicators-button">Reset Weights</button>
-                        <button id="run-womble-button" class="womble-indicators-button">Run</button> 
-                    </div>
-                </div>
-                <!-- <br>
+          </div>
+          <!-- <br>
                 <button id="submitOptions">Confirm selection</button> -->
-            </div>
-            <hr>
+        </div>
+        <hr />
 
-            <h5>View Options</h5>
+        <h5>View Options</h5>
 
-            <label>Wall Opacity: <span id="transparency-slider-value">100%</span></label>
-            <input id="transparency-slider" type="range" min="0" max="100" step="0" value="100">
+        <label
+          >Wall Opacity: <span id="transparency-slider-value">100%</span></label
+        >
+        <input
+          id="transparency-slider"
+          type="range"
+          min="0"
+          max="100"
+          step="0"
+          value="100"
+        />
 
-            <!-- <label>Min. Womble: <span id="min-slider-value">0</span></label>
+        <!-- <label>Min. Womble: <span id="min-slider-value">0</span></label>
             <input id="min-slider" type="range" min="0" max="1" step="0.01" value="0">
 
             <label>Max. Womble: <span id="max-slider-value">1</span></label>
             <input id="max-slider" type="range" min="0" max="1" step="0.01" value="100"> -->
 
-            <label>Filter Visible Womble Values:</label>
-            <div class="dual-slider-values">
-                <span id="min-slider-value">0</span>
-                <span>to</span>
-                <span id="max-slider-value">1</span>
-            </div>
-            <div class="dual-slider-container">
-                <div id="min-max-slider-track" class="dual-slider-track"></div>
-                <input id="min-slider" type="range" min="0" max="1" step="0.01" value="0">
-                <input id="max-slider" type="range" min="0" max="1" step="0.01" value="1">
-            </div>
-
-            <!-- All layer filter checkboxes in the HTML file should be in the form: [LAYER_ID]-checkbox -->
-            <div id="filter-buttons">
-                <label class="checkbox-container" for="boundaries-checkbox">Show Boundaries
-                    <input type="checkbox" id="boundaries-checkbox" checked="checked">
-                    <span class="checkmark"></span>
-                </label>
-
-                <label id="walls-check-label" class="checkbox-container" for="walls-checkbox">Show Walls
-                    <input type="checkbox" id="walls-checkbox" checked="checked">
-                    <span class="checkmark"></span>
-                </label>
-            </div>
-
-            <div>
-                <fieldset>
-                    <div id="color-checkbox-div">
-                        <label class="radio-container" for="color-checkbox" id="colorOnly-label">Width only
-                        </label>
-                        <input type="radio" id="color-checkbox" checked="checked" name="view">
-                            <span class="radio-checkmark"></span>
-                    </div>
-                    
-                    <div id="height-checkbox-div">
-                        <label id="height-check-label" class="radio-container" for="height-checkbox">Color only
-                        </label>
-                        <input type="radio" id="height-checkbox" name="view">
-                            <span class="radio-checkmark"></span>
-                    </div>
-                    
-                    <div id="both-checkbox-div">
-                        <label id="both-check-label" class="radio-container" for="both-checkbox">Both Color and Width
-                        </label>
-                        <input type="radio" id="both-checkbox" name="view">
-                            <span class="radio-checkmark"></span>
-                    </div>  
-                </fieldset>
-            </div>
-             
-            <hr>
-
-            <h5>Base Map</h5>
-
-            <div>
-                <fieldset>
-                    <div id="light-checkbox-div">
-                        <label class="radio-container" for="light-checkbox" id="light-label">Light Mode
-                        </label>
-                        <input type="radio" id="light-checkbox" checked="checked" name="style">
-                            <span class="radio-checkmark"></span>
-                    </div>
-                    
-                    <div id="dark-checkbox-div">
-                        <label id="dark-label" class="radio-container" for="dark-checkbox">Dark Mode
-                        </label>
-                        <input type="radio" id="dark-checkbox" name="style">
-                            <span class="radio-checkmark"></span>
-                    </div>
-                    
-                    <div id="satellite-checkbox-div">
-                        <label id="satellite-label" class="radio-container" for="satellite-checkbox">Satellite Mode
-                        </label>
-                        <input type="radio" id="satellite-checkbox" name="style">
-                            <span class="radio-checkmark"></span>
-                    </div>  
-                </fieldset>
-            </div>
-            <!-- <button id="test">test</button> -->
+        <label>Filter Visible Womble Values:</label>
+        <div class="dual-slider-values">
+          <span id="min-slider-value">0</span>
+          <span>to</span>
+          <span id="max-slider-value">1</span>
         </div>
+        <div class="dual-slider-container">
+          <div id="min-max-slider-track" class="dual-slider-track"></div>
+          <input
+            id="min-slider"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0"
+          />
+          <input
+            id="max-slider"
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value="1"
+          />
+        </div>
+        <div class="dual-slider-overview"></div>
+
+        <!-- All layer filter checkboxes in the HTML file should be in the form: [LAYER_ID]-checkbox -->
+        <div id="filter-buttons">
+          <label class="checkbox-container" for="boundaries-checkbox"
+            >Show Boundaries
+            <input type="checkbox" id="boundaries-checkbox" checked="checked" />
+            <span class="checkmark"></span>
+          </label>
+
+          <label
+            id="walls-check-label"
+            class="checkbox-container"
+            for="walls-checkbox"
+            >Show Walls
+            <input type="checkbox" id="walls-checkbox" checked="checked" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+
+        <div>
+          <fieldset>
+            <div id="color-checkbox-div">
+              <label
+                class="radio-container"
+                for="color-checkbox"
+                id="colorOnly-label"
+                >Width only
+              </label>
+              <input
+                type="radio"
+                id="color-checkbox"
+                checked="checked"
+                name="view"
+              />
+              <span class="radio-checkmark"></span>
+            </div>
+
+            <div id="height-checkbox-div">
+              <label
+                id="height-check-label"
+                class="radio-container"
+                for="height-checkbox"
+                >Color only
+              </label>
+              <input type="radio" id="height-checkbox" name="view" />
+              <span class="radio-checkmark"></span>
+            </div>
+
+            <div id="both-checkbox-div">
+              <label
+                id="both-check-label"
+                class="radio-container"
+                for="both-checkbox"
+                >Both Color and Width
+              </label>
+              <input type="radio" id="both-checkbox" name="view" />
+              <span class="radio-checkmark"></span>
+            </div>
+          </fieldset>
+        </div>
+
+        <hr />
+
+        <h5>Base Map</h5>
+
+        <div>
+          <fieldset>
+            <div id="light-checkbox-div">
+              <label
+                class="radio-container"
+                for="light-checkbox"
+                id="light-label"
+                >Light Mode
+              </label>
+              <input
+                type="radio"
+                id="light-checkbox"
+                checked="checked"
+                name="style"
+              />
+              <span class="radio-checkmark"></span>
+            </div>
+
+            <div id="dark-checkbox-div">
+              <label id="dark-label" class="radio-container" for="dark-checkbox"
+                >Dark Mode
+              </label>
+              <input type="radio" id="dark-checkbox" name="style" />
+              <span class="radio-checkmark"></span>
+            </div>
+
+            <div id="satellite-checkbox-div">
+              <label
+                id="satellite-label"
+                class="radio-container"
+                for="satellite-checkbox"
+                >Satellite Mode
+              </label>
+              <input type="radio" id="satellite-checkbox" name="style" />
+              <span class="radio-checkmark"></span>
+            </div>
+          </fieldset>
+        </div>
+        <!-- <button id="test">test</button> -->
+      </div>
     </div>
     <div id="loader" class="loader" hidden></div>
-    <div class='map-overlay-legend' id='legend'></div>
- 
-    <script src="js/boundaries.js" type="module"></script>
-    <script src="js/upload.js" type="module"></script>>
-    <script src="js/sliders.js" type="module"></script>
-    <script src="js/womble.js" type="module"></script>>
-    <script src="js/filter.js" type="module"></script>>
-    <script src="js/index.js" type="module"></script>
-    
-    <script src="js/indicatorOptions.js" type="module"></script>
-    <link rel="stylesheet" type="text/css" href="css/checkbox.css">
-    <link rel="stylesheet" type="text/css" href="css/dualSlider.css">
-    <link rel="stylesheet" type="text/css" href="css/select.css">
-    <link rel="stylesheet" type="text/css" href="css/wombleIndicatorButtons.css">
-</body>
+    <div class="map-overlay-legend" id="legend"></div>
 
+    <script src="js/boundaries.js" type="module"></script>
+    <script src="js/upload.js" type="module"></script>
+    >
+    <script src="js/sliders.js" type="module"></script>
+    <script src="js/womble.js" type="module"></script>
+    >
+    <script src="js/filter.js" type="module"></script>
+    >
+    <script src="js/index.js" type="module"></script>
+
+    <script src="js/indicatorOptions.js" type="module"></script>
+    <link rel="stylesheet" type="text/css" href="css/checkbox.css" />
+    <link rel="stylesheet" type="text/css" href="css/dualSlider.css" />
+    <link rel="stylesheet" type="text/css" href="css/select.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="css/wombleIndicatorButtons.css"
+    />
+    <script type="module" src="js/interface/legend.js"></script>
+  </body>
 </html>

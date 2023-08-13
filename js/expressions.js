@@ -1,5 +1,18 @@
+import { DEFAULT } from "./enums.js";
+import { getColorScale, getWombleScale } from "./util/scale.js";
+
 export function getColourExpression() {
-  const colors = ["#fed976", "#fd8d3c", "#fc4e2a", "#e31a1c"];
+  const n = DEFAULT.SCALESECTIONS;
+  const colors = getColorScale(n);
+  const wombleScale = getWombleScale(n);
+  let result = ["case"];
+  for (let i = n; i > 0; i--) {
+    result.push([">", ["to-number", ["get", "womble_scaled"]], wombleScale(i)]);
+    result.push(colors(i));
+  }
+  result.push(colors(0));
+  console.log(result);
+  return result;
 
   return [
     "case",

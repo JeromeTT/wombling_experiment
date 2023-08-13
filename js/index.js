@@ -26,6 +26,9 @@ import {
 import { initCollapsibleBehaviour } from "./collapsible.js";
 import { Dimensions } from "./enums.js";
 import { addStyleListeners } from "./styleOptions.js";
+
+import { appendLegend } from "./interface/legend.js";
+import { normaliseDataColumns, scaleDataColumns } from "./util/normalise.js";
 // console.log(geoJsonData);
 
 // Could also use fetch instead of import
@@ -43,12 +46,55 @@ const MAPBOX_TOKEN =
 export let indicatorsData;
 export let optionsData;
 export let csvAreaCode;
+export let originalIndicatorsData;
+export let selectedUnbuffered;
 export function setIndicatorsData(data) {
-  indicatorsData = data.data;
+  originalIndicatorsData = JSON.parse(JSON.stringify(data.data));
+  indicatorsData = JSON.parse(JSON.stringify(data.data));
   let headers = Object.keys(data.data[0]);
   csvAreaCode = headers.shift();
   optionsData = headers;
+  // indicatorsData = scaleDataColumns(originalIndicatorsData, headers);
+  // indicatorsData = normaliseDataColumns(originalIndicatorsData, headers);
+  // Normalise everything?
 
+  console.log("Indicators Data", indicatorsData);
+  console.log("headers", headers);
+  // Filter all boundaries where an area has undefined value
+  selectedUnbuffered["features"] = selectedUnbuffered["features"].filter(
+    (boundary) => {
+      let row1 = indicatorsData.find(
+        (row) => row["sa1"] == boundary.properties.sa1_id1
+      );
+      let row2 = indicatorsData.find(
+        (row) => row["sa1"] == boundary.properties.sa1_id2
+      );
+      return row1 != undefined && row2 != undefined;
+    }
+  );
+  // PREPROCESS EVERY SINGLE BOUNDARY
+  for (let i in selectedUnbuffered.features) {
+    let boundary = selectedUnbuffered.features[i];
+    let row1 = indicatorsData.find(
+      (row) => row["sa1"] == boundary.properties.sa1_id1
+    );
+    let row2 = indicatorsData.find(
+      (row) => row["sa1"] == boundary.properties.sa1_id2
+    );
+    for (let header of headers) {
+      boundary[header] = Math.abs(row1[header] - row2[header]);
+    }
+  }
+  // SCALE EVERY BOUNDARY
+  selectedUnbuffered.features = scaleDataColumns(
+    selectedUnbuffered.features,
+    headers
+  );
+  selectedUnbuffered.features = normaliseDataColumns(
+    selectedUnbuffered.features,
+    headers
+  );
+  console.log("ALL BOUNDARIES", selectedUnbuffered);
   createVariables(headers);
 }
 
@@ -113,34 +159,9 @@ let resetWeightsButton = document.getElementById("reset-weights-button");
 resetWeightsButton.addEventListener("click", setDefaultWeights);
 
 // Legend logic
-// create legend
-const legend = document.getElementById("legend");
-const colors = ["#fed976", "#fd8d3c", "#fc4e2a", "#e31a1c"];
-const womble_scaled_breaks = [0, 0.25, 0.5, 0.75, 1];
-
-const item = document.createElement("div");
-const value = document.createElement("span");
-value.innerHTML = "<b>Wombled Scaled Values</b>";
-item.appendChild(value);
-legend.appendChild(item);
-
-for (let i = 0; i < colors.length; i++) {
-  const color = colors[i];
-  const item = document.createElement("div");
-
-  const key = document.createElement("span");
-  key.className = "legend-key";
-  key.style.backgroundColor = color;
-
-  const value = document.createElement("span");
-  value.innerHTML =
-    womble_scaled_breaks[i] + " - " + womble_scaled_breaks[i + 1];
-
-  item.appendChild(key);
-  item.appendChild(value);
-  legend.appendChild(item);
-}
-
+// Create legend
+// TODO: Remove hard coding
+appendLegend();
 // when map loads, do...
 map.on("load", () => {
   document.getElementById("areasSelect").addEventListener("change", () => {
@@ -175,7 +196,7 @@ export function areaDropDownHandler(map) {
     },
   };
   let selection = document.getElementById("areasSelect").value;
-  let selectedUnbuffered = areaTypes[selection].unbuffered;
+  selectedUnbuffered = areaTypes[selection].unbuffered;
   let selectedBuffered = areaTypes[selection].buffered;
   let selectedAreas = areaTypes[selection].areas;
   let selectedAreaCodeProp = areaTypes[selection].areaCodeProp;
@@ -210,7 +231,8 @@ export function areaDropDownHandler(map) {
     };
     map.addSource("bufferedSource", bufferedSource);
   }
-
+  console.log("UNBUFFERED", selectedUnbuffered);
+  console.log("BUFFERED", selectedBuffered);
   // button for drawing the edge heights based on womble calculation
   let runWombleButton = document.getElementById("run-womble-button");
 

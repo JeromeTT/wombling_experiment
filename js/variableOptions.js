@@ -63,5 +63,3 @@ function variableCheckboxHandler() {
   }
   createIndicatorSliders(selectedVariables);
 }
-
-export { getWombleIndicators };

@@ -1,3 +1,9 @@
+import {
+  getColourExpression,
+  getHeightExpression,
+  getVariableWidthExpression,
+} from "../expressions.js";
+
 export function initSource(map, sourceData, sourceID) {
   // If source exists, simply update the data
   if (map.getSource(sourceID)) {
@@ -9,7 +15,7 @@ export function initSource(map, sourceData, sourceID) {
     type: "geojson",
     data: sourceData,
   });
-  initialiseLayer(map, sourceID);
+  initLayer(map, sourceID);
 }
 
 export function initLayer(map, sourceID) {
@@ -17,7 +23,9 @@ export function initLayer(map, sourceID) {
   let layer = { source: sourceID };
   switch (sourceID) {
     case "boundariesSource":
+      //
       layer = {
+        ...layer,
         id: "boundaries", // this needs to be unique
         type: "line",
         paint: {
@@ -25,8 +33,11 @@ export function initLayer(map, sourceID) {
           "line-width": 0.2,
         },
       };
+      break;
     case "areasSource":
+      //
       layer = {
+        ...layer,
         id: "areas", // this needs to be unique
         type: "fill",
         paint: {
@@ -35,37 +46,36 @@ export function initLayer(map, sourceID) {
         },
         //filter: ["boolean", true], // initialise filter to show no features by setting false
       };
+      break;
     case "wallsSource2D":
-    // pass
+      //
+      layer = {
+        ...layer,
+        id: "walls2D",
+        type: "line",
+        layout: {
+          "line-cap": "round",
+          "line-join": "miter", // this doesn't seem to actually join the lines properly
+        },
+        paint: {
+          "line-color": getColourExpression(),
+          "line-width": getVariableWidthExpression(),
+        },
+      };
+      break;
     case "wallsSource3D":
-    // pass
-    case "wallsSource":
-      // if in 2d mode, draw thicknesses using line
-      if (GlobalData.appDimension == Dimensions.TWO_D) {
-        layer = {
-          id: "walls",
-          type: "line",
-          layout: {
-            "line-cap": "round",
-            "line-join": "miter", // this doesn't seem to actually join the lines properly
-          },
-          paint: {
-            "line-color": getColourExpression(),
-            "line-width": getVariableWidthExpression(),
-          },
-        };
-      }
-      // if in 3d mode, draw heights using fill-extrusion
-      else if (GlobalData.appDimension == Dimensions.THREE_D) {
-        layer = {
-          id: "walls", // this needs to be unique
-          type: "fill-extrusion",
-          paint: {
-            "fill-extrusion-color": getColourExpression(),
-            "fill-extrusion-height": getHeightExpression(),
-          },
-        };
-      }
+      //
+      layer = {
+        ...layer,
+        id: "walls3D", // this needs to be unique
+        type: "fill-extrusion",
+        paint: {
+          "fill-extrusion-color": getColourExpression(),
+          "fill-extrusion-height": getHeightExpression(),
+        },
+      };
+      break;
   }
+  console.log("Adding layer", sourceID, layer);
   map.addLayer(layer);
 }

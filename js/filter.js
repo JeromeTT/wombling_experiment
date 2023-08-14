@@ -73,7 +73,7 @@ function boundariesCheckboxHandler(map) {
 
 function wallsCheckboxHandler(map) {
   // if the clicked layer doesn't exist, return
-  if (!map.getLayer("walls")) {
+  if (!map.getLayer("walls2D") || !map.getLayer("walls3D")) {
     console.log("Layer not yet rendered");
     return;
   }
@@ -81,64 +81,55 @@ function wallsCheckboxHandler(map) {
   let checkbox = document.getElementById("walls-checkbox");
   // if the checkbox is checked, make sure the layer is visible by changing the layout object's visibility property
   map.setLayoutProperty(
-    "walls",
+    "walls2D",
+    "visibility",
+    checkbox.checked ? "visible" : "none"
+  );
+
+  map.setLayoutProperty(
+    "walls3D",
     "visibility",
     checkbox.checked ? "visible" : "none"
   );
 }
 
 function colourCheckboxHandler(map) {
-  let id = "walls";
   let checkbox = document.getElementById(`color-checkbox`);
 
-  if (!map.getLayer(id)) {
+  if (!map.getLayer("walls2D") || !map.getLayer("walls3D")) {
     console.log("Layer not yet rendered");
     return;
   }
   // if the checkbox is checked, make sure all wall colours are the same
   if (checkbox.checked) {
     let color = "#808080";
-    if (GlobalData.appDimension == Dimensions.TWO_D) {
-      map.setPaintProperty("walls", "line-color", color);
-    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
-      map.setPaintProperty("walls", "fill-extrusion-color", color);
-    }
-
-    if (GlobalData.appDimension == Dimensions.TWO_D) {
-      map.setPaintProperty("walls", "line-width", getVariableWidthExpression());
-    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
-      map.setPaintProperty(
-        "walls",
-        "fill-extrusion-height",
-        getHeightExpression()
-      );
-    }
+    map.setPaintProperty("walls2D", "line-color", color);
+    map.setPaintProperty("walls3D", "fill-extrusion-color", color);
+    map.setPaintProperty("walls2D", "line-width", getVariableWidthExpression());
+    map.setPaintProperty(
+      "walls3D",
+      "fill-extrusion-height",
+      getHeightExpression()
+    );
   }
 }
 
 function heightCheckboxHandler(map) {
-  let id = "walls";
   let checkbox = document.getElementById(`height-checkbox`);
   // if the clicked layer doesn't exist, return
-  if (!map.getLayer(id)) {
+  if (!map.getLayer("walls2D") || !map.getLayer("walls3D")) {
     console.log("Layer not yet rendered");
     return;
   }
 
   // if the checkbox is checked, set all heights/widths to be the same
   if (checkbox.checked) {
-    if (GlobalData.appDimension == Dimensions.TWO_D) {
-      map.setPaintProperty("walls", "line-width", getConstantWidthExpression());
-    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
-      map.setPaintProperty("walls", "fill-extrusion-height", 250);
-    }
+    map.setPaintProperty("walls2D", "line-width", getConstantWidthExpression());
+    map.setPaintProperty("walls3D", "fill-extrusion-height", 250);
 
     let colourExpression = getColourExpression();
-    if (GlobalData.appDimension == Dimensions.TWO_D) {
-      map.setPaintProperty("walls", "line-color", colourExpression);
-    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
-      map.setPaintProperty("walls", "fill-extrusion-color", colourExpression);
-    }
+    map.setPaintProperty("walls2D", "line-color", colourExpression);
+    map.setPaintProperty("walls3D", "fill-extrusion-color", colourExpression);
   }
 
   // // if checkbox is NOT checked, make sure the heights/widths are variable
@@ -156,7 +147,7 @@ function heightCheckboxHandler(map) {
 }
 
 function colorAndHeightHandler(map) {
-  let id = "walls";
+  let id = "walls2D";
   let checkbox = document.getElementById(`both-checkbox`);
   // if the clicked layer doesn't exist, return
   if (!map.getLayer(id)) {
@@ -166,22 +157,16 @@ function colorAndHeightHandler(map) {
 
   // if the checkbox is checked, set all heights/widths to be variable and apply colour
   if (checkbox.checked) {
-    if (GlobalData.appDimension == Dimensions.TWO_D) {
-      map.setPaintProperty("walls", "line-width", getVariableWidthExpression());
-    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
-      map.setPaintProperty(
-        "walls",
-        "fill-extrusion-height",
-        getHeightExpression()
-      );
-    }
+    map.setPaintProperty("walls2D", "line-width", getVariableWidthExpression());
+    map.setPaintProperty(
+      "walls3D",
+      "fill-extrusion-height",
+      getHeightExpression()
+    );
 
     let colourExpression = getColourExpression();
-    if (GlobalData.appDimension == Dimensions.TWO_D) {
-      map.setPaintProperty("walls", "line-color", colourExpression);
-    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
-      map.setPaintProperty("walls", "fill-extrusion-color", colourExpression);
-    }
+    map.setPaintProperty("walls2D", "line-color", colourExpression);
+    map.setPaintProperty("walls3D", "fill-extrusion-color", colourExpression);
   }
 }
 
@@ -195,25 +180,22 @@ function transparencySliderHandler(map) {
   // value indicator
   transparencySliderValue.textContent = transparencySlider.value + "%";
 
-  if (!map.getLayer("walls")) {
+  if (!map.getLayer("walls2D")) {
     console.log("Layer doesn't exist");
     return;
   }
 
   // adjust the boundary layer's fill-extrusion-opacity value. If you change the id of the boundary layer you'll also have to change it here
-  if (GlobalData.appDimension == Dimensions.TWO_D) {
-    map.setPaintProperty(
-      "walls",
-      "line-opacity",
-      parseInt(transparencySlider.value, 10) / 100
-    );
-  } else if (GlobalData.appDimension == Dimensions.THREE_D) {
-    map.setPaintProperty(
-      "walls",
-      "fill-extrusion-opacity",
-      parseInt(transparencySlider.value, 10) / 100
-    );
-  }
+  map.setPaintProperty(
+    "walls2D",
+    "line-opacity",
+    parseInt(transparencySlider.value, 10) / 100
+  );
+  map.setPaintProperty(
+    "walls3D",
+    "fill-extrusion-opacity",
+    parseInt(transparencySlider.value, 10) / 100
+  );
 }
 
 function minMaxSliderHandler(map) {
@@ -242,7 +224,7 @@ function minMaxSliderHandler(map) {
   minSliderValue.textContent = min;
   maxSliderValue.textContent = max;
 
-  if (!map.getLayer("walls")) {
+  if (!map.getLayer("walls2D")) {
     console.log("No walls to filter yet");
     return;
   }
@@ -262,10 +244,8 @@ function minMaxSliderHandler(map) {
     lessThanMaxExpression,
   ];
 
-  map.setFilter("walls", filterExpression);
-  console.log(
-    map.querySourceFeatures("wallsSource", { filter: filterExpression })
-  );
+  map.setFilter("walls2D", filterExpression);
+  map.setFilter("walls3D", filterExpression);
 }
 
 function fillDualSliderColour(slider1, slider2, sliderTrack, maxValue) {

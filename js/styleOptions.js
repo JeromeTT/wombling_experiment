@@ -1,5 +1,4 @@
 import { addAreasLayer, addBoundariesLayer } from "./boundaries.js";
-import { addWallsLayer } from "./womble.js";
 
 function darkCheckboxHandler(map) {
   switchStyle(map, "mapbox://styles/mapbox/dark-v11");
@@ -16,7 +15,7 @@ function satelliteCheckboxHandler(map) {
 function switchStyle(map, styleUrl) {
   // get all layers
   let layers = [];
-  let layerIds = ["areas", "boundaries", "walls"];
+  let layerIds = ["areas", "boundaries", "walls2D", "walls3D"];
   for (let id of layerIds) {
     if (map.getLayer(id)) {
       let mapLayer = map.getLayer(id);
@@ -43,7 +42,8 @@ function switchStyle(map, styleUrl) {
     "boundariesSource",
     "bufferedSource",
     "unbufferedSource",
-    "wallsSource",
+    "wallsSource2D",
+    "wallsSoruce3D",
   ];
 
   for (let id of sourceIds) {
@@ -79,7 +79,8 @@ function switchStyle(map, styleUrl) {
 
     addBoundariesLayer(map);
     addAreasLayer(map);
-    addWallsLayer(map);
+    // TODO
+    //addWallsLayer(map);
   };
 
   // only re-add the sources/layers once the style has loaded

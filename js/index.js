@@ -197,13 +197,16 @@ export function areaDropDownHandler(map) {
       data: GlobalData.selectedBuffered,
     });
   }
+
   console.log("UNBUFFERED", GlobalData.selectedUnbuffered);
   console.log("BUFFERED", GlobalData.selectedBuffered);
+
   // button for drawing the edge heights based on womble calculation
   closeExistingPopups(map);
 }
 
 // Run Womble Button
+function test() {}
 let runWombleButton = document.getElementById("run-womble-button");
 runWombleButton.addEventListener("click", () => {
   if (!GlobalData.indicatorsData) {
@@ -211,15 +214,19 @@ runWombleButton.addEventListener("click", () => {
   }
 
   document.getElementById("loader").removeAttribute("hidden"); // show loading spinner
+  console.log();
+
   // Draw walls if in 3d mode, using buffered source (polygon features)
-  if (GlobalData.appDimension == Dimensions.THREE_D) {
-    // TODO: loading spinner is broken sometimes?
-    setTimeout(runWomble, 1, map, GlobalData.selectedBuffered); // 1 ms delay is required so that the loading spinner appears immediately before drawWalls is called, maybe see if there's a better way to do this
-  }
+  setTimeout(
+    runWomble,
+    1,
+    map,
+    GlobalData.selectedBuffered,
+    GlobalData.selectedUnbuffered
+  ); // 1 ms delay is required so that the loading spinner appears immediately before drawWalls is called, maybe see if there's a better way to do this
   // Draw thicknesses if in 2d mode, using unbuffered source (line features)
-  else if (GlobalData.appDimension == Dimensions.TWO_D) {
-    setTimeout(runWomble, 1, map, GlobalData.selectedUnbuffered);
-  }
+  // setTimeout(runWomble, 1, map, GlobalData.selectedUnbuffered);
+
   // drawWalls(map, boundaries_SA1_2016);
 });
 

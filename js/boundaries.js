@@ -72,7 +72,7 @@ export function addAreasLayer(map) {
  * @param {*} map mapbox map
  */
 export function initClickableWallBehaviour(map) {
-  map.on("click", "walls", (e) => {
+  map.on("click", ["walls3D", "walls2D"], (e) => {
     closeExistingPopups(map);
     let wall = e.features[0];
 
@@ -113,10 +113,10 @@ export function initClickableWallBehaviour(map) {
   });
 
   // change mouse pointer upon hovering over walls
-  map.on("mouseenter", "walls", () => {
+  map.on("mouseenter", ["walls3D", "walls2D"], () => {
     map.getCanvas().style.cursor = "pointer";
   });
-  map.on("mouseleave", "walls", () => {
+  map.on("mouseleave", ["walls3D", "walls2D"], () => {
     map.getCanvas().style.cursor = "";
   });
 }

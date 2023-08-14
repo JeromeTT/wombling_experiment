@@ -2,13 +2,9 @@ import { retrieveIndicatorSliders } from "./sliders.js";
 import { Dimensions } from "./enums.js";
 import { closeExistingPopups } from "./interface/popups.js";
 import { runAllInputHandlers } from "./filter.js";
-import {
-  getColourExpression,
-  getHeightExpression,
-  getVariableWidthExpression,
-} from "./expressions.js";
 import { histogram } from "./interface/charts.js";
 import { GlobalData } from "./data.js";
+import { initSource } from "./interface/map.js";
 
 /**
  * Draws the heights of the edges based on their womble values.
@@ -16,74 +12,23 @@ import { GlobalData } from "./data.js";
  * @param {*} map mapbox map object that the walls will be drawn on
  * @param {*} source geojson source for the boundaries upon which walls will be drawn
  */
-export function runWomble(map, source) {
+export function runWomble(map, source3D, source2D) {
   closeExistingPopups(map);
   GlobalData.selectedVariables = GlobalData.getWombleIndicators(
     GlobalData.optionsData
   );
-  let wallsData = generateWombleFeaturesData(source);
-  // appendIndicatorsToAreas(map, "areasSource");
+  let wallsData3D = generateWombleFeaturesData(source3D);
+  let wallsData2D = generateWombleFeaturesData(source2D);
+  initSource(map, wallsData3D, "wallsSource3D");
+  initSource(map, wallsData2D, "wallsSource2D");
 
-  // if walls have already been drawn (i.e. walls source exists), update the source data with the new data
-  if (map.getSource("wallsSource")) {
-    map.getSource("wallsSource").setData(wallsData);
-  }
-  // else, add the walls source and draw the layer for the first time
-  else {
-    // use the data json object as the source for the walls layer
-    let wallsSource = {
-      type: "geojson",
-      data: wallsData,
-    };
-
-    map.addSource("wallsSource", wallsSource);
-    addWallsLayer(map);
-  }
-
+  runAllInputHandlers(map);
   // hide boundaries directly after running womble
   document.getElementById("boundaries-checkbox").checked = false;
   map.setLayoutProperty("boundaries", "visibility", "none");
 
   // hide loading spinner once the map loads
   document.getElementById("loader").setAttribute("hidden", true);
-}
-
-export function addWallsLayer(map) {
-  // create and draw the layer
-  let wallsLayer;
-
-  // if in 2d mode, draw thicknesses using line
-  if (GlobalData.appDimension == Dimensions.TWO_D) {
-    wallsLayer = {
-      id: "walls",
-      type: "line",
-      source: "wallsSource",
-      layout: {
-        "line-cap": "round",
-        "line-join": "miter", // this doesn't seem to actually join the lines properly
-      },
-      paint: {
-        "line-color": getColourExpression(),
-        "line-width": getVariableWidthExpression(),
-      },
-    };
-  }
-  // if in 3d mode, draw heights using fill-extrusion
-  else if (GlobalData.appDimension == Dimensions.THREE_D) {
-    wallsLayer = {
-      id: "walls", // this needs to be unique
-      type: "fill-extrusion",
-      source: "wallsSource",
-      paint: {
-        "fill-extrusion-color": getColourExpression(),
-        "fill-extrusion-height": getHeightExpression(),
-      },
-    };
-  }
-
-  map.addLayer(wallsLayer);
-
-  runAllInputHandlers(map);
 }
 
 /**
@@ -321,8 +266,9 @@ export class DimensionToggle {
     map.setMinZoom(9);
 
     // delete thicknesses and draw walls
-    this.#convertWalls(map);
-
+    //this.#convertWalls(map);
+    map.setLayoutProperty("walls2D", "visibility", "none");
+    map.setLayoutProperty("walls3D", "visibility", "visible");
     // Change the radio label to height only
     document.getElementById("colorOnly-label").innerText = "Height only";
     document.getElementById("both-check-label").innerText =
@@ -337,14 +283,14 @@ export class DimensionToggle {
     // disable pitch
     this._previousPitch = map.getPitch();
     map.easeTo({ pitch: 0, duration: 1000 });
-    map.setMaxPitch(0);
 
     // set min zoom
     map.setMinZoom(9);
-
+    map.setMaxPitch(0);
     // delete walls and draw thicknesses
-    this.#convertWalls(map);
-
+    //this.#convertWalls(map);
+    map.setLayoutProperty("walls3D", "visibility", "none");
+    map.setLayoutProperty("walls2D", "visibility", "visible");
     // Change the radio label to width only
     document.getElementById("colorOnly-label").innerText = "Width only";
     document.getElementById("both-check-label").innerText =

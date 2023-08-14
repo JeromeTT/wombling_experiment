@@ -1,4 +1,7 @@
-import { addAreasLayer, addBoundariesLayer } from "./boundaries.js";
+import {
+  addAreasLayer,
+  addBoundariesLayer,
+} from "./interface/map/boundaries.js";
 
 function darkCheckboxHandler(map) {
   switchStyle(map, "mapbox://styles/mapbox/dark-v11");
@@ -40,8 +43,6 @@ function switchStyle(map, styleUrl) {
   let sourceIds = [
     "areasSource",
     "boundariesSource",
-    "bufferedSource",
-    "unbufferedSource",
     "wallsSource2D",
     "wallsSoruce3D",
   ];

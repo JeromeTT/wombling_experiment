@@ -2,7 +2,7 @@ import {
   getColourExpression,
   getHeightExpression,
   getVariableWidthExpression,
-} from "../expressions.js";
+} from "../../expressions.js";
 
 export function initSource(map, sourceData, sourceID) {
   // If source exists, simply update the data

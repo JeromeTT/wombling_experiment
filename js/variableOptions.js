@@ -23,9 +23,11 @@ export function createVariables(optionsArray) {
     node.innerHTML =
       '<label class = "checkbox-container"  for="variable-' +
       i +
+      '"><div class="checkbox-text" title="' +
+      optionsArray[i] +
       '">' +
       optionsArray[i] +
-      '<input type="checkbox" id="variable-' +
+      '</div><input type="checkbox" id="variable-' +
       i +
       '" name="check' +
       i +

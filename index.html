@@ -21,7 +21,6 @@
     />
     <link rel="stylesheet" type="text/css" href="index.css" />
     <!-- <link rel="stylesheet" type="text/css" href="css/radio.css"> -->
-
     <!-- <link rel="stylesheet" type="text/css" href="css/checkbox.css"> -->
   </head>
 
@@ -71,7 +70,7 @@
 
           <h6>Select Womble Indicators:</h6>
 
-          <div id="options"></div>
+          <div class="womble-options" id="options"></div>
           <!-- This div contains the reset and run buttons for the indicator sliders. Initially hidden until the user selects their indicators -->
           <div id="womble-indicators-buttons" class="hide">
             <div class="womble-indicators-buttons-container">
@@ -172,43 +171,27 @@
 
         <div>
           <fieldset>
-            <div id="color-checkbox-div">
-              <label
-                class="radio-container"
-                for="color-checkbox"
-                id="colorOnly-label"
-                >Width only
-              </label>
+            <label class="checkbox-container" id="color-checkbox-div">
+              Show Wall Color
               <input
-                type="radio"
+                type="checkbox"
                 id="color-checkbox"
                 checked="checked"
                 name="view"
               />
-              <span class="radio-checkmark"></span>
-            </div>
-
-            <div id="height-checkbox-div">
-              <label
-                id="height-check-label"
-                class="radio-container"
-                for="height-checkbox"
-                >Color only
-              </label>
-              <input type="radio" id="height-checkbox" name="view" />
-              <span class="radio-checkmark"></span>
-            </div>
-
-            <div id="both-checkbox-div">
-              <label
-                id="both-check-label"
-                class="radio-container"
-                for="both-checkbox"
-                >Both Color and Width
-              </label>
-              <input type="radio" id="both-checkbox" name="view" />
-              <span class="radio-checkmark"></span>
-            </div>
+              <span class="checkmark"></span>
+            </label>
+            <br />
+            <label class="checkbox-container" id="height-checkbox-div">
+              Show Wall Width
+              <input
+                type="checkbox"
+                id="height-checkbox"
+                checked="checked"
+                name="view"
+              />
+              <span class="checkmark"></span>
+            </label>
           </fieldset>
         </div>
 
@@ -254,23 +237,12 @@
             </div>
           </fieldset>
         </div>
-        <!-- <button id="test">test</button> -->
       </div>
     </div>
     <div id="loader" class="loader" hidden></div>
     <div class="map-overlay-legend" id="legend"></div>
 
-    <script src="js/boundaries.js" type="module"></script>
-    <script src="js/upload.js" type="module"></script>
-    >
-    <script src="js/sliders.js" type="module"></script>
-    <script src="js/womble.js" type="module"></script>
-    >
-    <script src="js/filter.js" type="module"></script>
-    >
     <script src="js/index.js" type="module"></script>
-
-    <script src="js/indicatorOptions.js" type="module"></script>
     <link rel="stylesheet" type="text/css" href="css/checkbox.css" />
     <link rel="stylesheet" type="text/css" href="css/dualSlider.css" />
     <link rel="stylesheet" type="text/css" href="css/select.css" />
@@ -279,6 +251,5 @@
       type="text/css"
       href="css/wombleIndicatorButtons.css"
     />
-    <script type="module" src="js/interface/legend.js"></script>
   </body>
 </html>

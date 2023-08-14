@@ -11,19 +11,7 @@ export function getColourExpression() {
     result.push(colors(i));
   }
   result.push(colors(0));
-  console.log(result);
   return result;
-
-  return [
-    "case",
-    [">", ["to-number", ["get", "womble_scaled"]], 0.75],
-    colors[3],
-    [">", ["to-number", ["get", "womble_scaled"]], 0.5],
-    colors[2],
-    [">", ["to-number", ["get", "womble_scaled"]], 0.25],
-    colors[1],
-    colors[0],
-  ];
 }
 
 export function getVariableWidthExpression() {

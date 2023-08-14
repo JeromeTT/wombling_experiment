@@ -19,7 +19,6 @@ export function addInputListeners(map) {
     { id: "walls-checkbox", handler: wallsCheckboxHandler, event: "click" },
     { id: "color-checkbox", handler: colourCheckboxHandler, event: "click" },
     { id: "height-checkbox", handler: heightCheckboxHandler, event: "click" },
-    { id: "both-checkbox", handler: colorAndHeightHandler, event: "click" },
     {
       id: "transparency-slider",
       handler: transparencySliderHandler,
@@ -44,129 +43,93 @@ export function runAllInputHandlers(map) {
     wallsCheckboxHandler,
     colourCheckboxHandler,
     heightCheckboxHandler,
-    colorAndHeightHandler,
     transparencySliderHandler,
     minMaxSliderHandler,
+    dimensionHandler,
   ];
 
   for (let handler of inputHandlers) {
     handler(map);
   }
 }
-
+/**
+ * Toggles boundaries according to boundaries checkbox.
+ * @param {*} map map object
+ * @returns
+ */
 function boundariesCheckboxHandler(map) {
   // if the clicked layer doesn't exist, return
   if (!map.getLayer("boundaries")) {
-    console.log("Layer not yet rendered");
     return;
   }
-
-  let checkbox = document.getElementById("boundaries-checkbox");
-  // if checkbox is NOT checked, make sure the layer is invisible
-  // if the checkbox is checked, make sure the layer is visible by changing the layout object's visibility property
   map.setLayoutProperty(
     "boundaries",
     "visibility",
-    checkbox.checked ? "visible" : "none"
+    document.getElementById("boundaries-checkbox").checked ? "visible" : "none"
   );
 }
 
+/**
+ * Toggle walls according to walls checkbox.
+ * @param {*} map map object
+ * @returns
+ */
 function wallsCheckboxHandler(map) {
-  // if the clicked layer doesn't exist, return
-  if (!map.getLayer("walls2D") || !map.getLayer("walls3D")) {
-    console.log("Layer not yet rendered");
-    return;
+  let checkbox = document.getElementById("walls-checkbox");
+  if (
+    map.getLayer("walls3D") &&
+    GlobalData.appDimension == Dimensions.THREE_D
+  ) {
+    map.setLayoutProperty(
+      "walls3D",
+      "visibility",
+      checkbox.checked ? "visible" : "none"
+    );
   }
 
-  let checkbox = document.getElementById("walls-checkbox");
-  // if the checkbox is checked, make sure the layer is visible by changing the layout object's visibility property
-  map.setLayoutProperty(
-    "walls2D",
-    "visibility",
-    checkbox.checked ? "visible" : "none"
-  );
-
-  map.setLayoutProperty(
-    "walls3D",
-    "visibility",
-    checkbox.checked ? "visible" : "none"
-  );
+  if (map.getLayer("walls2D") && GlobalData.appDimension == Dimensions.TWO_D) {
+    map.setLayoutProperty(
+      "walls2D",
+      "visibility",
+      checkbox.checked ? "visible" : "none"
+    );
+  }
 }
 
+/**
+ *
+ * @param {*} map map object
+ * @returns
+ */
 function colourCheckboxHandler(map) {
   let checkbox = document.getElementById(`color-checkbox`);
-
-  if (!map.getLayer("walls2D") || !map.getLayer("walls3D")) {
-    console.log("Layer not yet rendered");
-    return;
-  }
-  // if the checkbox is checked, make sure all wall colours are the same
-  if (checkbox.checked) {
-    let color = "#808080";
-    map.setPaintProperty("walls2D", "line-color", color);
+  let color = checkbox.checked ? getColourExpression() : "#808080";
+  if (map.getLayer("walls3D")) {
     map.setPaintProperty("walls3D", "fill-extrusion-color", color);
-    map.setPaintProperty("walls2D", "line-width", getVariableWidthExpression());
-    map.setPaintProperty(
-      "walls3D",
-      "fill-extrusion-height",
-      getHeightExpression()
-    );
+  }
+
+  if (map.getLayer("walls2D")) {
+    map.setPaintProperty("walls2D", "line-color", color);
   }
 }
 
 function heightCheckboxHandler(map) {
   let checkbox = document.getElementById(`height-checkbox`);
-  // if the clicked layer doesn't exist, return
-  if (!map.getLayer("walls2D") || !map.getLayer("walls3D")) {
-    console.log("Layer not yet rendered");
-    return;
-  }
-
-  // if the checkbox is checked, set all heights/widths to be the same
-  if (checkbox.checked) {
-    map.setPaintProperty("walls2D", "line-width", getConstantWidthExpression());
-    map.setPaintProperty("walls3D", "fill-extrusion-height", 250);
-
-    let colourExpression = getColourExpression();
-    map.setPaintProperty("walls2D", "line-color", colourExpression);
-    map.setPaintProperty("walls3D", "fill-extrusion-color", colourExpression);
-  }
-
-  // // if checkbox is NOT checked, make sure the heights/widths are variable
-  // else {
-  //   if (appDimension == Dimensions.TWO_D) {
-  //     map.setPaintProperty("walls", "line-width", getWidthExpression());
-  //   } else if (appDimension == Dimensions.THREE_D) {
-  //     map.setPaintProperty(
-  //       "walls",
-  //       "fill-extrusion-height",
-  //       getHeightExpression()
-  //     );
-  //   }
-  // }
-}
-
-function colorAndHeightHandler(map) {
-  let id = "walls2D";
-  let checkbox = document.getElementById(`both-checkbox`);
-  // if the clicked layer doesn't exist, return
-  if (!map.getLayer(id)) {
-    console.log("Layer not yet rendered");
-    return;
-  }
-
-  // if the checkbox is checked, set all heights/widths to be variable and apply colour
-  if (checkbox.checked) {
-    map.setPaintProperty("walls2D", "line-width", getVariableWidthExpression());
+  if (map.getLayer("walls3D")) {
     map.setPaintProperty(
       "walls3D",
       "fill-extrusion-height",
-      getHeightExpression()
+      checkbox.checked ? getHeightExpression() : 250
     );
-
-    let colourExpression = getColourExpression();
-    map.setPaintProperty("walls2D", "line-color", colourExpression);
-    map.setPaintProperty("walls3D", "fill-extrusion-color", colourExpression);
+  }
+  if (map.getLayer("walls2D")) {
+    map.setPaintProperty(
+      "walls2D",
+      "line-width",
+      checkbox.checked
+        ? getVariableWidthExpression()
+        : getConstantWidthExpression()
+    );
   }
 }
 
@@ -254,6 +217,18 @@ function fillDualSliderColour(slider1, slider2, sliderTrack, maxValue) {
   sliderTrack.style.background = `linear-gradient(to right, #efefef ${percent1}%, #0075ff ${percent1}%, #0075ff ${percent2}%, #efefef ${percent2}%)`;
 }
 
+function dimensionHandler(map) {
+  switch (GlobalData.appDimension) {
+    case Dimensions.TWO_D:
+      map.setLayoutProperty("walls3D", "visibility", "none");
+      map.setLayoutProperty("walls2D", "visibility", "visible");
+      break;
+    case Dimensions.THREE_D:
+      map.setLayoutProperty("walls2D", "visibility", "none");
+      map.setLayoutProperty("walls3D", "visibility", "visible");
+      break;
+  }
+}
 // TODO: move control buttons into one file together?
 // ALSO, changing the style just doesn't work, b/c it deletes all existing layers and sources
 export class darkModeToggle {

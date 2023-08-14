@@ -1,70 +1,12 @@
-import { closeExistingPopups } from "./interface/popups.js";
-import { GlobalData } from "./data.js";
-
-/**
- * Draws a map layer of the user's selected boundaries. No heights or colours are drawn yet.
- * @param {*} map the mapbox map object that we're working on
- */
-export function initMapBoundaries(map, sourceData) {
-  // Remove existing layer and source
-  if (map.getSource("boundariesSource")) {
-    map.getSource("boundariesSource").setData(sourceData);
-    return;
-  }
-
-  //
-  map.addSource("boundariesSource", {
-    type: "geojson",
-    data: sourceData,
-  });
-  addBoundariesLayer(map);
-  console.log("Map boundaries initialised");
-}
-
+import { closeExistingPopups } from "../popups.js";
+import { GlobalData } from "../../data.js";
+import { initLayer } from "./map.js";
 export function addBoundariesLayer(map) {
-  // layer defines how to display the source
-  let boundaries = {
-    id: "boundaries", // this needs to be unique
-    type: "line",
-    source: "boundariesSource",
-    paint: {
-      "line-color": "black",
-      "line-width": 0.2,
-    },
-  };
-
-  map.addLayer(boundaries);
-}
-// Map areas are displayed
-export function initMapAreas(map, sourceData) {
-  // source defines the data to be drawn
-  if (map.getSource("areasSource")) {
-    map.getSource("areasSource").setData(sourceData);
-    return;
-  }
-
-  map.addSource("areasSource", {
-    type: "geojson",
-    data: sourceData,
-  });
-  addAreasLayer(map);
-  console.log("Map areas initialised");
+  initLayer(map, "boundariesSource");
 }
 
 export function addAreasLayer(map) {
-  // layer defines how to display the source
-  let areas = {
-    id: "areas", // this needs to be unique
-    type: "fill",
-    source: "areasSource",
-    paint: {
-      "fill-color": "blue",
-      "fill-opacity": 0.21,
-    },
-    //filter: ["boolean", true], // initialise filter to show no features by setting false
-  };
-
-  map.addLayer(areas);
+  initLayer(map, "areasSource");
 }
 
 /**

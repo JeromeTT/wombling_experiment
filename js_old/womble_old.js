@@ -165,3 +165,38 @@
 //   // hide loading spinner once the map loads
 //   document.getElementById("loader").setAttribute("hidden", true);
 // }
+
+// #convertWalls(map) {
+//   if (!map.getSource("wallsSource")) {
+//     console.log("No existing walls to convert");
+//     return;
+//   }
+
+//   let wallsData = map.getSource("wallsSource")._data;
+
+//   // will use either unbuffered or buffered features
+//   // unbuffered features if we're converting to 2d b/c we want lines
+//   // buffered features if we're converting to 3d b/c we want polygons that we can make fill-extrusions from
+//   let rawFeatures;
+//   if (GlobalData.appDimension == Dimensions.TWO_D) {
+//     rawFeatures = map.getSource("unbufferedSource")._data["features"];
+//   } else if (GlobalData.appDimension == Dimensions.THREE_D) {
+//     rawFeatures = map.getSource("bufferedSource")._data["features"];
+//   }
+
+//   // overwrite the geometries for each feature in the existing walls data
+//   for (let wall of wallsData["features"]) {
+//     // the raw source data will have more features than the existing walls data, b/c the walls data will have filtered out edges where the womble cannot be calculated
+//     // therefore, we need to "find" the features in the raw source that correspond with our existing walls
+//     let rawFeature = rawFeatures.find(
+//       (feature) => feature["properties"]["id"] == wall["properties"]["id"]
+//     );
+
+//     rawFeature = JSON.parse(JSON.stringify(rawFeature)); // deep copy so we don't somehow modify raw source
+//     wall["geometry"] = rawFeature["geometry"];
+//   }
+
+//   map.removeLayer("walls");
+//   map.getSource("wallsSource").setData(wallsData);
+//   addWallsLayer(map);
+// }

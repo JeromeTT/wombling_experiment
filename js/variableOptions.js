@@ -64,19 +64,4 @@ function variableCheckboxHandler() {
   createIndicatorSliders(selectedVariables);
 }
 
-function getSelectValues(optionsArray) {
-  let values = [];
-  for (let i = 0; i < optionsArray.length; i++) {
-    let currentVariable = document.getElementById(`variable-${i}`);
-
-    if (currentVariable.checked) {
-      // make indicator slider visisble
-      // createIndicatorSliders(currentVariable.innerText, i);
-      values.push(optionsArray[i]);
-    }
-  }
-
-  return values;
-}
-
-export { getSelectValues };
+export { getWombleIndicators };

@@ -1,12 +1,12 @@
-import { createIndicatorSliders, setDefaultWeights } from "./sliders.js";
-import { createVariables, getSelectValues } from "./variableOptions.js";
+import { setDefaultWeights } from "./sliders.js";
+import { createVariables } from "./variableOptions.js";
 import {
-  closeExistingPopups,
   initClickableAreaBehaviour,
   initClickableWallBehaviour,
   initMapAreas,
   initMapBoundaries,
 } from "./boundaries.js";
+import { closeExistingPopups } from "./interface/popups.js";
 import { runWomble, DimensionToggle } from "./womble.js";
 import boundaries_SA1_2011_buffered from "../boundaries_SA1_2011_dist_wgs84_buffered7.geojson" assert { type: "json" };
 import boundaries_SA1_2011 from "../boundaries_SA1_2011_dist_wgs84.geojson" assert { type: "json" };
@@ -23,12 +23,13 @@ import {
   getValues,
 } from "./indicatorOptions.js";
 
-import { initCollapsibleBehaviour } from "./collapsible.js";
+import { menuInitCollapsibleBehaviour } from "./interface/menu.js";
 import { Dimensions } from "./enums.js";
 import { addStyleListeners } from "./styleOptions.js";
 
-import { appendLegend } from "./interface/legend.js";
+import { initLegend as initLegend } from "./interface/legend.js";
 import { normaliseDataColumns, scaleDataColumns } from "./util/normalise.js";
+import { GlobalData } from "./data.js";
 // console.log(geoJsonData);
 
 // Could also use fetch instead of import
@@ -38,47 +39,45 @@ import { normaliseDataColumns, scaleDataColumns } from "./util/normalise.js";
 //   })
 //   .then((data) => console.log(data));
 
-// mapbox token (taken from existing project)
+// Mapbox token (taken from existing project)
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoibmR1bzAwMDMiLCJhIjoiY2tnNHlucmF3MHA4djJ6czNkaHRycmo1OCJ9.xfU4SWH35W5BYtJP8VnTEA";
 
-// variable for the csv data is made global
-export let indicatorsData;
-export let optionsData;
-export let csvAreaCode;
-export let originalIndicatorsData;
-export let selectedUnbuffered;
+/**
+ * TODO:
+ * @param {*} data
+ */
 export function setIndicatorsData(data) {
-  originalIndicatorsData = JSON.parse(JSON.stringify(data.data));
-  indicatorsData = JSON.parse(JSON.stringify(data.data));
+  GlobalData.originalIndicatorsData = JSON.parse(JSON.stringify(data.data));
+  GlobalData.indicatorsData = JSON.parse(JSON.stringify(data.data));
   let headers = Object.keys(data.data[0]);
-  csvAreaCode = headers.shift();
-  optionsData = headers;
+  GlobalData.csvAreaCode = headers.shift();
+  GlobalData.optionsData = headers;
   // indicatorsData = scaleDataColumns(originalIndicatorsData, headers);
   // indicatorsData = normaliseDataColumns(originalIndicatorsData, headers);
   // Normalise everything?
 
-  console.log("Indicators Data", indicatorsData);
+  console.log("Indicators Data", GlobalData.indicatorsData);
   console.log("headers", headers);
   // Filter all boundaries where an area has undefined value
-  selectedUnbuffered["features"] = selectedUnbuffered["features"].filter(
-    (boundary) => {
-      let row1 = indicatorsData.find(
-        (row) => row["sa1"] == boundary.properties.sa1_id1
-      );
-      let row2 = indicatorsData.find(
-        (row) => row["sa1"] == boundary.properties.sa1_id2
-      );
-      return row1 != undefined && row2 != undefined;
-    }
-  );
-  // PREPROCESS EVERY SINGLE BOUNDARY
-  for (let i in selectedUnbuffered.features) {
-    let boundary = selectedUnbuffered.features[i];
-    let row1 = indicatorsData.find(
+  GlobalData.selectedUnbuffered["features"] = GlobalData.selectedUnbuffered[
+    "features"
+  ].filter((boundary) => {
+    let row1 = GlobalData.indicatorsData.find(
       (row) => row["sa1"] == boundary.properties.sa1_id1
     );
-    let row2 = indicatorsData.find(
+    let row2 = GlobalData.indicatorsData.find(
+      (row) => row["sa1"] == boundary.properties.sa1_id2
+    );
+    return row1 != undefined && row2 != undefined;
+  });
+  // PREPROCESS EVERY SINGLE BOUNDARY
+  for (let i in GlobalData.selectedUnbuffered.features) {
+    let boundary = GlobalData.selectedUnbuffered.features[i];
+    let row1 = GlobalData.indicatorsData.find(
+      (row) => row["sa1"] == boundary.properties.sa1_id1
+    );
+    let row2 = GlobalData.indicatorsData.find(
       (row) => row["sa1"] == boundary.properties.sa1_id2
     );
     for (let header of headers) {
@@ -86,30 +85,16 @@ export function setIndicatorsData(data) {
     }
   }
   // SCALE EVERY BOUNDARY
-  selectedUnbuffered.features = scaleDataColumns(
-    selectedUnbuffered.features,
+  GlobalData.selectedUnbuffered.features = scaleDataColumns(
+    GlobalData.selectedUnbuffered.features,
     headers
   );
-  selectedUnbuffered.features = normaliseDataColumns(
-    selectedUnbuffered.features,
+  GlobalData.selectedUnbuffered.features = normaliseDataColumns(
+    GlobalData.selectedUnbuffered.features,
     headers
   );
-  console.log("ALL BOUNDARIES", selectedUnbuffered);
+  console.log("ALL BOUNDARIES", GlobalData.selectedUnbuffered);
   createVariables(headers);
-}
-
-export let geojsonAreaCode;
-export function setGeojsonAreaCode(areaCode) {
-  geojsonAreaCode = areaCode;
-}
-export function getGeojsonAreaCode() {
-  return geojsonAreaCode;
-}
-
-// stores the user's selected variables for running the womble calc
-export let selectedVariables;
-export function setSelectedVariables(variables) {
-  selectedVariables = variables;
 }
 
 // export function setIndicatorsData(data) {
@@ -122,12 +107,7 @@ export function setSelectedVariables(variables) {
 //   document.getElementById("selectionBlock").classList.remove("hide");
 // }
 
-// another global to store the dimension that the app is currently in (2d or 3d)
-export let appDimension = Dimensions.TWO_D;
-export function setDimension(dimension) {
-  appDimension = dimension;
-}
-
+// Main
 let map = new mapboxgl.Map({
   container: "map",
   center: [144.9628, -37.8102], // long lat of melb
@@ -141,7 +121,8 @@ let map = new mapboxgl.Map({
   antialias: true,
 });
 
-initCollapsibleBehaviour();
+menuInitCollapsibleBehaviour();
+initLegend();
 
 map.addControl(new mapboxgl.NavigationControl());
 map.addControl(new DimensionToggle({ pitch: 45 }));
@@ -154,15 +135,11 @@ map.addControl(new DimensionToggle({ pitch: 45 }));
 //   createIndicatorSliders(selectedValues);
 // }
 
-// add event listener to the button for resetting indicator weight sliders
+// Add event listener to the button for resetting indicator weight sliders
 let resetWeightsButton = document.getElementById("reset-weights-button");
 resetWeightsButton.addEventListener("click", setDefaultWeights);
 
-// Legend logic
-// Create legend
-// TODO: Remove hard coding
-appendLegend();
-// when map loads, do...
+// When map loads, do...
 map.on("load", () => {
   document.getElementById("areasSelect").addEventListener("change", () => {
     areaDropDownHandler(map);
@@ -175,10 +152,6 @@ map.on("load", () => {
   addInputListeners(map);
   addStyleListeners(map);
 });
-
-// document.getElementById("test").addEventListener("click", () => {
-//   console.log(map.getStyle());
-// });
 
 export function areaDropDownHandler(map) {
   let areaTypes = {
@@ -195,72 +168,60 @@ export function areaDropDownHandler(map) {
       areaCodeProp: "SA1_MAIN16",
     },
   };
+  // Set variables depending on selection
   let selection = document.getElementById("areasSelect").value;
-  selectedUnbuffered = areaTypes[selection].unbuffered;
-  let selectedBuffered = areaTypes[selection].buffered;
+  GlobalData.selectedUnbuffered = areaTypes[selection].unbuffered;
+  GlobalData.selectedBuffered = areaTypes[selection].buffered;
   let selectedAreas = areaTypes[selection].areas;
-  let selectedAreaCodeProp = areaTypes[selection].areaCodeProp;
-  setGeojsonAreaCode(selectedAreaCodeProp);
+  GlobalData.geojsonAreaCode = areaTypes[selection].areaCodeProp;
 
-  // re-init map boundaries
+  // Re-init map boundaries
+  console.log(selectedAreas);
   initMapBoundaries(map, selectedAreas);
   initMapAreas(map, selectedAreas);
 
-  // re-init unbuffered and buffered sources
-  if (map.getSource("wallsSource")) {
-    map.removeLayer("walls");
-    map.removeSource("wallsSource");
-  }
-
   if (map.getSource("unbufferedSource")) {
-    map.getSource("unbufferedSource").setData(selectedUnbuffered);
+    map.getSource("unbufferedSource").setData(GlobalData.selectedUnbuffered);
   } else {
-    let unbufferedSource = {
+    map.addSource("unbufferedSource", {
       type: "geojson",
-      data: selectedUnbuffered,
-    };
-    map.addSource("unbufferedSource", unbufferedSource);
+      data: GlobalData.selectedUnbuffered,
+    });
   }
 
   if (map.getSource("bufferedSource")) {
-    map.getSource("bufferedSource").setData(selectedBuffered);
+    map.getSource("bufferedSource").setData(GlobalData.selectedBuffered);
   } else {
-    let bufferedSource = {
+    map.addSource("bufferedSource", {
       type: "geojson",
-      data: selectedBuffered,
-    };
-    map.addSource("bufferedSource", bufferedSource);
+      data: GlobalData.selectedBuffered,
+    });
   }
-  console.log("UNBUFFERED", selectedUnbuffered);
-  console.log("BUFFERED", selectedBuffered);
+  console.log("UNBUFFERED", GlobalData.selectedUnbuffered);
+  console.log("BUFFERED", GlobalData.selectedBuffered);
   // button for drawing the edge heights based on womble calculation
-  let runWombleButton = document.getElementById("run-womble-button");
-
-  // clone the button to remove existing listeners
-  let newRunWombleButton = runWombleButton.cloneNode(true);
-  runWombleButton.parentNode.replaceChild(newRunWombleButton, runWombleButton);
-
-  newRunWombleButton.addEventListener("click", () => {
-    if (indicatorsData) {
-      document.getElementById("loader").removeAttribute("hidden"); // show loading spinner
-
-      // draw walls if in 3d mode, using buffered source (polygon features)
-      if (appDimension == Dimensions.THREE_D) {
-        // TODO: loading spinner is broken sometimes?
-        setTimeout(runWomble, 1, map, selectedBuffered); // 1 ms delay is required so that the loading spinner appears immediately before drawWalls is called, maybe see if there's a better way to do this
-      }
-      // draw thicknesses if in 2d mode, using unbuffered source (line features)
-      else if (appDimension == Dimensions.TWO_D) {
-        setTimeout(runWomble, 1, map, selectedUnbuffered);
-      }
-
-      // drawWalls(map, boundaries_SA1_2016);
-    } else {
-      console.log("Indicators data not found");
-    }
-  });
-
   closeExistingPopups(map);
-
-  document.getElementById("boundaries-checkbox").checked = true;
 }
+
+// Run Womble Button
+let runWombleButton = document.getElementById("run-womble-button");
+runWombleButton.addEventListener("click", () => {
+  if (!GlobalData.indicatorsData) {
+    console.log("Indicators data not found");
+  }
+
+  document.getElementById("loader").removeAttribute("hidden"); // show loading spinner
+  // Draw walls if in 3d mode, using buffered source (polygon features)
+  if (GlobalData.appDimension == Dimensions.THREE_D) {
+    // TODO: loading spinner is broken sometimes?
+    setTimeout(runWomble, 1, map, GlobalData.selectedBuffered); // 1 ms delay is required so that the loading spinner appears immediately before drawWalls is called, maybe see if there's a better way to do this
+  }
+  // Draw thicknesses if in 2d mode, using unbuffered source (line features)
+  else if (GlobalData.appDimension == Dimensions.TWO_D) {
+    setTimeout(runWomble, 1, map, GlobalData.selectedUnbuffered);
+  }
+  // drawWalls(map, boundaries_SA1_2016);
+});
+
+// Default config
+document.getElementById("boundaries-checkbox").checked = true;

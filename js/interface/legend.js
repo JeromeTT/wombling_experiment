@@ -1,9 +1,9 @@
 import { DEFAULT } from "../enums.js";
 import { getColorScale, getWombleScale } from "../util/scale.js";
-const sampleData = await d3.csv(
-  "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv"
-);
-export function appendLegend() {
+/**
+ * Appends the map legend to the HTML.
+ */
+export function initLegend() {
   const n = DEFAULT.SCALESECTIONS;
   const colorScale = getColorScale(n);
   const wombleScale = getWombleScale(n);

@@ -1,3 +1,4 @@
+import { GlobalData } from "./data.js";
 import { Dimensions, LightModes } from "./enums.js";
 import {
   getColourExpression,
@@ -5,7 +6,6 @@ import {
   getHeightExpression,
   getVariableWidthExpression,
 } from "./expressions.js";
-import { appDimension } from "./index.js";
 
 export function addInputListeners(map) {
   // each element in this array corresponds to some sort of option that the user has
@@ -62,14 +62,13 @@ function boundariesCheckboxHandler(map) {
   }
 
   let checkbox = document.getElementById("boundaries-checkbox");
-  // if the checkbox is checked, make sure the layer is visible by changing the layout object's visibility property
-  if (checkbox.checked) {
-    map.setLayoutProperty("boundaries", "visibility", "visible");
-  }
   // if checkbox is NOT checked, make sure the layer is invisible
-  else {
-    map.setLayoutProperty("boundaries", "visibility", "none");
-  }
+  // if the checkbox is checked, make sure the layer is visible by changing the layout object's visibility property
+  map.setLayoutProperty(
+    "boundaries",
+    "visibility",
+    checkbox.checked ? "visible" : "none"
+  );
 }
 
 function wallsCheckboxHandler(map) {
@@ -81,13 +80,11 @@ function wallsCheckboxHandler(map) {
 
   let checkbox = document.getElementById("walls-checkbox");
   // if the checkbox is checked, make sure the layer is visible by changing the layout object's visibility property
-  if (checkbox.checked) {
-    map.setLayoutProperty("walls", "visibility", "visible");
-  }
-  // if checkbox is NOT checked, make sure the layer is invisible
-  else {
-    map.setLayoutProperty("walls", "visibility", "none");
-  }
+  map.setLayoutProperty(
+    "walls",
+    "visibility",
+    checkbox.checked ? "visible" : "none"
+  );
 }
 
 function colourCheckboxHandler(map) {
@@ -98,19 +95,18 @@ function colourCheckboxHandler(map) {
     console.log("Layer not yet rendered");
     return;
   }
-
   // if the checkbox is checked, make sure all wall colours are the same
   if (checkbox.checked) {
     let color = "#808080";
-    if (appDimension == Dimensions.TWO_D) {
+    if (GlobalData.appDimension == Dimensions.TWO_D) {
       map.setPaintProperty("walls", "line-color", color);
-    } else if (appDimension == Dimensions.THREE_D) {
+    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
       map.setPaintProperty("walls", "fill-extrusion-color", color);
     }
 
-    if (appDimension == Dimensions.TWO_D) {
+    if (GlobalData.appDimension == Dimensions.TWO_D) {
       map.setPaintProperty("walls", "line-width", getVariableWidthExpression());
-    } else if (appDimension == Dimensions.THREE_D) {
+    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
       map.setPaintProperty(
         "walls",
         "fill-extrusion-height",
@@ -131,16 +127,16 @@ function heightCheckboxHandler(map) {
 
   // if the checkbox is checked, set all heights/widths to be the same
   if (checkbox.checked) {
-    if (appDimension == Dimensions.TWO_D) {
+    if (GlobalData.appDimension == Dimensions.TWO_D) {
       map.setPaintProperty("walls", "line-width", getConstantWidthExpression());
-    } else if (appDimension == Dimensions.THREE_D) {
+    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
       map.setPaintProperty("walls", "fill-extrusion-height", 250);
     }
 
     let colourExpression = getColourExpression();
-    if (appDimension == Dimensions.TWO_D) {
+    if (GlobalData.appDimension == Dimensions.TWO_D) {
       map.setPaintProperty("walls", "line-color", colourExpression);
-    } else if (appDimension == Dimensions.THREE_D) {
+    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
       map.setPaintProperty("walls", "fill-extrusion-color", colourExpression);
     }
   }
@@ -170,9 +166,9 @@ function colorAndHeightHandler(map) {
 
   // if the checkbox is checked, set all heights/widths to be variable and apply colour
   if (checkbox.checked) {
-    if (appDimension == Dimensions.TWO_D) {
+    if (GlobalData.appDimension == Dimensions.TWO_D) {
       map.setPaintProperty("walls", "line-width", getVariableWidthExpression());
-    } else if (appDimension == Dimensions.THREE_D) {
+    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
       map.setPaintProperty(
         "walls",
         "fill-extrusion-height",
@@ -181,9 +177,9 @@ function colorAndHeightHandler(map) {
     }
 
     let colourExpression = getColourExpression();
-    if (appDimension == Dimensions.TWO_D) {
+    if (GlobalData.appDimension == Dimensions.TWO_D) {
       map.setPaintProperty("walls", "line-color", colourExpression);
-    } else if (appDimension == Dimensions.THREE_D) {
+    } else if (GlobalData.appDimension == Dimensions.THREE_D) {
       map.setPaintProperty("walls", "fill-extrusion-color", colourExpression);
     }
   }
@@ -205,13 +201,13 @@ function transparencySliderHandler(map) {
   }
 
   // adjust the boundary layer's fill-extrusion-opacity value. If you change the id of the boundary layer you'll also have to change it here
-  if (appDimension == Dimensions.TWO_D) {
+  if (GlobalData.appDimension == Dimensions.TWO_D) {
     map.setPaintProperty(
       "walls",
       "line-opacity",
       parseInt(transparencySlider.value, 10) / 100
     );
-  } else if (appDimension == Dimensions.THREE_D) {
+  } else if (GlobalData.appDimension == Dimensions.THREE_D) {
     map.setPaintProperty(
       "walls",
       "fill-extrusion-opacity",

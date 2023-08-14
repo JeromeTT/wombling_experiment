@@ -1,4 +1,4 @@
-export function barChart(
+export function histogram(
   data,
   parent,
   scale = 4,

@@ -1,4 +1,4 @@
-import { indicatorsData, setIndicatorsData } from "./index.js";
+import { setIndicatorsData } from "./index.js";
 import Papa from "https://cdn.skypack.dev/papaparse@5.3.0";
 
 let uploadBtn = document.querySelector("#csvInput");

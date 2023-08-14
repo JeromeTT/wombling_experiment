@@ -1,29 +1,23 @@
-import {
-  csvAreaCode,
-  getGeojsonAreaCode,
-  indicatorsData,
-  selectedVariables,
-} from "./index.js";
+import { closeExistingPopups } from "./interface/popups.js";
+import { GlobalData } from "./data.js";
 
 /**
  * Draws a map layer of the user's selected boundaries. No heights or colours are drawn yet.
  * @param {*} map the mapbox map object that we're working on
  */
 export function initMapBoundaries(map, sourceData) {
-  // source defines the data to be drawn
-  let source = {
-    type: "geojson",
-    data: sourceData,
-  };
-
+  // Remove existing layer and source
   if (map.getSource("boundariesSource")) {
-    map.removeLayer("boundaries");
-    map.removeSource("boundariesSource");
+    map.getSource("boundariesSource").setData(sourceData);
+    return;
   }
 
-  map.addSource("boundariesSource", source);
+  //
+  map.addSource("boundariesSource", {
+    type: "geojson",
+    data: sourceData,
+  });
   addBoundariesLayer(map);
-
   console.log("Map boundaries initialised");
 }
 
@@ -41,22 +35,19 @@ export function addBoundariesLayer(map) {
 
   map.addLayer(boundaries);
 }
-
+// Map areas are displayed
 export function initMapAreas(map, sourceData) {
   // source defines the data to be drawn
-  let source = {
-    type: "geojson",
-    data: sourceData,
-  };
-
   if (map.getSource("areasSource")) {
-    map.removeLayer("areas");
-    map.removeSource("areasSource");
+    map.getSource("areasSource").setData(sourceData);
+    return;
   }
 
-  map.addSource("areasSource", source);
+  map.addSource("areasSource", {
+    type: "geojson",
+    data: sourceData,
+  });
   addAreasLayer(map);
-
   console.log("Map areas initialised");
 }
 
@@ -68,9 +59,9 @@ export function addAreasLayer(map) {
     source: "areasSource",
     paint: {
       "fill-color": "blue",
-      "fill-opacity": 0.3,
+      "fill-opacity": 0.21,
     },
-    filter: ["boolean", false], // initialise filter to show no features by setting false
+    //filter: ["boolean", true], // initialise filter to show no features by setting false
   };
 
   map.addLayer(areas);
@@ -116,7 +107,7 @@ export function initClickableWallBehaviour(map) {
     // TODO: maybe modify this/future sa1 area files to use a more homogenous property name (e.g. area_id)
     map.setFilter("areas", [
       "in",
-      ["get", getGeojsonAreaCode()],
+      ["get", GlobalData.geojsonAreaCode],
       ["literal", areaIds],
     ]);
   });
@@ -134,26 +125,28 @@ export function initClickableAreaBehaviour(map) {
   map.on("click", "areas", (e) => {
     let area = e.features[0];
     console.log(area);
-    let areaCode = area["properties"][getGeojsonAreaCode()];
+    let areaCode = area["properties"][GlobalData.geojsonAreaCode];
 
     // find indicators that correspond with the area that was clicked on
-    let correspondingIndicators = indicatorsData.find((indicators) => {
-      let indicatorsCode = indicators[csvAreaCode]; // csvAreaCode is global and initialised in setIndicatorsData()
+    let correspondingIndicators = GlobalData.indicatorsData.find(
+      (indicators) => {
+        let indicatorsCode = indicators[GlobalData.csvAreaCode]; // csvAreaCode is global and initialised in setIndicatorsData()
 
-      // if code is a number, convert it to string
-      if (!isNaN(indicatorsCode)) {
-        indicatorsCode = indicatorsCode.toString(); // both codes have to be strings for comparison
+        // if code is a number, convert it to string
+        if (!isNaN(indicatorsCode)) {
+          indicatorsCode = indicatorsCode.toString(); // both codes have to be strings for comparison
+        }
+
+        return indicatorsCode == areaCode;
       }
-
-      return indicatorsCode == areaCode;
-    });
+    );
 
     // let selectedIndicators = selectedVariables;
     correspondingIndicators = Object.entries(correspondingIndicators); // convert indicators object to an array
 
     // filter out any indicators that were NOT selected by user, i.e. keep only selected indicators
     correspondingIndicators = correspondingIndicators.filter(
-      ([key, value]) => selectedVariables.includes(key) // selectedVariables is a global
+      ([key, value]) => GlobalData.selectedVariables.includes(key) // selectedVariables is a global
     );
     console.log(correspondingIndicators);
 
@@ -177,14 +170,4 @@ export function initClickableAreaBehaviour(map) {
   map.on("mouseleave", "areas", () => {
     map.getCanvas().style.cursor = "";
   });
-}
-
-export function closeExistingPopups(map) {
-  let popups = document.getElementsByClassName("mapboxgl-popup");
-  while (popups.length > 0) {
-    popups[0].remove();
-  }
-
-  // unhighlight selected areas
-  map.setFilter("areas", ["boolean", false]);
 }

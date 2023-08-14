@@ -1,4 +1,4 @@
-export function initCollapsibleBehaviour() {
+export function menuInitCollapsibleBehaviour() {
   let collapsible = document.getElementById("menu-collapsible");
   let menuContents = document.getElementById("menu-contents");
   menuContents.style.display = "block"; // initialised to block, so that the if statement in the event listener works correctly

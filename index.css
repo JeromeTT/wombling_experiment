@@ -110,6 +110,14 @@ input[type="file"] {
   animation: spin 2s linear infinite;
 }
 
+.loader-text {
+  font-size: 40px;
+  text-align: center;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+}
 /* Safari */
 @-webkit-keyframes spin {
   0% {
@@ -122,10 +130,10 @@ input[type="file"] {
 
 @keyframes spin {
   0% {
-    transform: rotate(0deg);
+    transform: translate(-50%, -50%) rotate(0deg);
   }
   100% {
-    transform: rotate(360deg);
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 

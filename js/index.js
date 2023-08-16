@@ -22,6 +22,7 @@ import { addStyleListeners } from "./styleOptions.js";
 import { initLegend as initLegend } from "./interface/legend.js";
 import { GlobalData } from "./data.js";
 import { changeBG } from "./upload.js";
+import { showLoader } from "./interface/loader.js";
 
 // Could also use fetch instead of import
 // fetch("./boundaries_SA1_2016.geojson")
@@ -33,7 +34,6 @@ import { changeBG } from "./upload.js";
 // Mapbox token (taken from existing project)
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoibmR1bzAwMDMiLCJhIjoiY2tnNHlucmF3MHA4djJ6czNkaHRycmo1OCJ9.xfU4SWH35W5BYtJP8VnTEA";
-
 export function areaDropDownHandler(map) {
   let areaTypes = {
     sa1_2011: {
@@ -73,7 +73,6 @@ export function areaDropDownHandler(map) {
 //// MAIN ////
 // Main map object definition
 let uploadBtn = document.querySelector("#csvInput");
-
 uploadBtn.addEventListener("change", changeBG);
 
 let map = new mapboxgl.Map({
@@ -123,20 +122,15 @@ map.on("load", () => {
 
 // Run Womble Button
 let runWombleButton = document.getElementById("run-womble-button");
-runWombleButton.addEventListener("click", () => {
+runWombleButton.addEventListener("click", async () => {
   if (!GlobalData.indicatorsData) {
     console.log("Indicators data not found");
   }
-
-  document.getElementById("loader").removeAttribute("hidden"); // show loading spinner
+  await showLoader(true, "Performing wombling");
   // Draw walls if in 3d mode, using buffered source (polygon features)
-  setTimeout(
-    runWomble,
-    1,
-    map,
-    GlobalData.selectedUnbuffered,
-    GlobalData.selectedBuffered
-  ); // 1 ms delay is required so that the loading spinner appears immediately before drawWalls is called, maybe see if there's a better way to do this
+  runWomble(map, GlobalData.selectedUnbuffered, GlobalData.selectedBuffered);
+
+  await showLoader(false);
 });
 
 // Default config

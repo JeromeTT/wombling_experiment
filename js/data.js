@@ -1,7 +1,11 @@
 import { Dimensions } from "./enums.js";
 import { createVariables } from "./variableOptions.js";
-import { normaliseDataColumns, scaleDataColumns } from "./util/normalise.js";
-
+import {
+  normaliseDataColumns,
+  scaleDataColumns,
+  rankDataColumns,
+} from "./util/normalise.js";
+import { showLoader } from "./interface/loader.js";
 export class GlobalData {
   static geojsonAreaCode;
   // stores the user's selected variables for running the womble calc
@@ -34,7 +38,6 @@ export class GlobalData {
         values.push(optionsArray[i]);
       }
     }
-
     return values;
   }
 }
@@ -43,7 +46,9 @@ export class GlobalData {
  * TODO:
  * @param {*} data
  */
-export function setIndicatorsData(data) {
+export async function setIndicatorsData(data) {
+  await showLoader(true, "Starting data preprocessing");
+
   GlobalData.originalIndicatorsData = JSON.parse(JSON.stringify(data.data));
   GlobalData.indicatorsData = JSON.parse(JSON.stringify(data.data));
   let headers = Object.keys(data.data[0]);
@@ -53,16 +58,13 @@ export function setIndicatorsData(data) {
   // Normalise everything?
   console.log("Indicators Data", GlobalData.indicatorsData);
   console.log("headers", headers);
-
+  await showLoader(true, "Removing non-indicator boundaries");
   // Remove all boundaries which do not have indicators assigned to them
-  GlobalData.selectedUnbuffered["features"] = removeUndefinedBoundaries(
-    GlobalData.selectedUnbuffered["features"]
-  );
-  GlobalData.selectedBuffered["features"] = removeUndefinedBoundaries(
-    GlobalData.selectedBuffered["features"]
-  );
+  removeUndefinedBoundaries(GlobalData.selectedUnbuffered);
+  removeUndefinedBoundaries(GlobalData.selectedBuffered);
 
   // PREPROCESS EVERY SINGLE BOUNDARY
+  await showLoader(true, "Performing pre-wombling");
   for (let i in GlobalData.selectedUnbuffered.features) {
     let boundary = GlobalData.selectedUnbuffered.features[i];
     let row1 = GlobalData.indicatorsData.find(
@@ -71,8 +73,9 @@ export function setIndicatorsData(data) {
     let row2 = GlobalData.indicatorsData.find(
       (row) => row["sa1"] == boundary.properties.sa1_id2
     );
+    boundary["raw"] = {};
     for (let header of headers) {
-      boundary[header] = Math.abs(row1[header] - row2[header]);
+      boundary["raw"][header] = Math.abs(row1[header] - row2[header]);
     }
   }
 
@@ -84,35 +87,33 @@ export function setIndicatorsData(data) {
     let row2 = GlobalData.indicatorsData.find(
       (row) => row["sa1"] == boundary.properties.sa1_id2
     );
+    boundary["raw"] = {};
     for (let header of headers) {
-      boundary[header] = Math.abs(row1[header] - row2[header]);
+      boundary["raw"][header] = Math.abs(row1[header] - row2[header]);
     }
   }
-
+  await showLoader(true, "Performing data scaling.");
   // SCALE EVERY BOUNDARY
-  GlobalData.selectedUnbuffered.features = scaleDataColumns(
-    GlobalData.selectedUnbuffered.features,
-    headers
-  );
-  GlobalData.selectedUnbuffered.features = normaliseDataColumns(
-    GlobalData.selectedUnbuffered.features,
-    headers
-  );
+  setTimeout;
+  await scaleDataColumns(GlobalData.selectedUnbuffered.features, headers);
+  await scaleDataColumns(GlobalData.selectedBuffered.features, headers);
 
-  GlobalData.selectedBuffered.features = scaleDataColumns(
-    GlobalData.selectedBuffered.features,
-    headers
-  );
-  GlobalData.selectedBuffered.features = normaliseDataColumns(
-    GlobalData.selectedBuffered.features,
-    headers
-  );
-  console.log("ALL BOUNDARIES", GlobalData.selectedUnbuffered);
+  await showLoader(true, "Performing data normalisation.");
+  await normaliseDataColumns(GlobalData.selectedUnbuffered.features, headers);
+  await normaliseDataColumns(GlobalData.selectedBuffered.features, headers);
+
+  await showLoader(true, "Performing data ranking.");
+  await rankDataColumns(GlobalData.selectedUnbuffered.features, headers);
+  await rankDataColumns(GlobalData.selectedBuffered.features, headers);
+
+  console.log("ALL BOUNDARIES UNBUFFERED", GlobalData.selectedUnbuffered);
+  console.log("ALL BOUNDARIES BUFFERED", GlobalData.selectedBuffered);
+  await showLoader(false);
   createVariables(headers);
 }
 
-function removeUndefinedBoundaries(features) {
-  return features.filter((boundary) => {
+function removeUndefinedBoundaries(source) {
+  source.features = source.features.filter((boundary) => {
     let row1 = GlobalData.indicatorsData.find(
       (row) => row["sa1"] == boundary.properties.sa1_id1
     );

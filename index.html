@@ -197,6 +197,31 @@
 
         <hr />
 
+        <h5>Dev Tools</h5>
+
+        <label class="checkbox-container" id="toggle-edge-selection-checkbox">
+          Toggle Edge Selection Mode
+          <input
+            type="checkbox"
+            id="height-checkbox"
+            checked="checked"
+            name="view"
+          />
+          <span class="checkmark"></span>
+        </label>
+
+        <label class="checkbox-container" id="toggle-edge-selection-checkbox">
+          Toggle Edge Selection Mode
+          <input
+            type="checkbox"
+            id="height-checkbox"
+            checked="checked"
+            name="view"
+          />
+          <span class="checkmark"></span>
+        </label>
+        <hr />
+
         <h5>Base Map</h5>
 
         <div>
@@ -239,7 +264,11 @@
         </div>
       </div>
     </div>
-    <div id="loader" class="loader" hidden></div>
+    <div class="loader-panel" id="loader-panel" hidden>
+      <div id="loader" class="loader"></div>
+      <div class="loader-text" id="loader-text">Loading...</div>
+    </div>
+
     <div class="map-overlay-legend" id="legend"></div>
 
     <script src="js/index.js" type="module"></script>

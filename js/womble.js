@@ -5,6 +5,7 @@ import { runAllInputHandlers } from "./filter.js";
 import { histogram } from "./interface/charts.js";
 import { GlobalData } from "./data.js";
 import { initSource } from "./interface/map/map.js";
+import { showLoader } from "./interface/loader.js";
 
 /**
  * Draws the heights of the edges based on their womble values.
@@ -17,18 +18,28 @@ export function runWomble(map, source2D, source3D) {
   GlobalData.selectedVariables = GlobalData.getWombleIndicators(
     GlobalData.optionsData
   );
-  let wallsData3D = generateWombleFeaturesData(source3D);
-  let wallsData2D = generateWombleFeaturesData(source2D);
-  initSource(map, wallsData3D, "wallsSource3D");
-  initSource(map, wallsData2D, "wallsSource2D");
+  generateWombleFeaturesData(source2D, source3D);
+  initSource(
+    map,
+    {
+      type: "FeatureCollection",
+      features: source3D.features,
+    },
+    "wallsSource3D"
+  );
+  initSource(
+    map,
+    {
+      type: "FeatureCollection",
+      features: source2D.features,
+    },
+    "wallsSource2D"
+  );
 
   runAllInputHandlers(map);
   // hide boundaries directly after running womble
   document.getElementById("boundaries-checkbox").checked = false;
   map.setLayoutProperty("boundaries", "visibility", "none");
-
-  // hide loading spinner once the map loads
-  document.getElementById("loader").setAttribute("hidden", true);
 }
 
 /**
@@ -38,48 +49,34 @@ export function runWomble(map, source2D, source3D) {
  * @param {*} source geojson source for the boundaries upon which the womble features will be drawn
  * @returns data in json form that can be supplied as the data property in a mapbox source
  */
-function generateWombleFeaturesData(source) {
-  let edges = source["features"]; // get all edges from the source into one array
-
-  let rawWombleValues = [];
-  let maxWomble = 0; // used to calculate womble_scaled
-
+function generateWombleFeaturesData(source2D, source3D) {
+  let generatedWombleValues = [];
   // create array of womble values for each edge
-  for (let edge of edges) {
-    let womble = calculateWomble(edge);
-    rawWombleValues.push(womble);
-
-    // keep track of the largest womble value
-    if (womble > maxWomble) {
-      maxWomble = womble;
-    }
+  for (let edge of source2D["features"]) {
+    generatedWombleValues.push(calculateWomble(edge));
   }
 
   // handling the case where the max womble is somehow zero, i dont think this should ever happen
+  let maxWomble = Math.max(...generatedWombleValues);
   if (maxWomble == 0) {
     console.log("Max womble value in this data set is zero");
-    document.getElementById("loader").setAttribute("hidden", true);
+    showLoader(true, "Error: Max womble = 0");
     return;
   }
 
-  // create a new geojson that will be used for the womble features source data
-  let wombleFeaturesData = {
-    type: "FeatureCollection",
-    features: [],
-  };
-  console.log(rawWombleValues);
-  histogram(rawWombleValues, ".dual-slider-overview");
-  // add each edge that has a non-zero womble value to the walls source data
-  for (let i = 0; i < edges.length; i++) {
-    let edge = JSON.parse(JSON.stringify(edges[i])); // deep copying the edge so the original source is not modified
-    if (rawWombleValues[i] != null) {
-      edge["properties"]["womble"] = rawWombleValues[i];
-      edge["properties"]["womble_scaled"] = rawWombleValues[i] / maxWomble;
-      wombleFeaturesData.features.push(edge);
+  histogram(generatedWombleValues, ".dual-slider-overview");
+  // Assign the values in place
+  for (let i = 0; i < source2D.features.length; i++) {
+    if (generatedWombleValues[i] != null) {
+      source2D.features[i]["properties"]["womble"] = generatedWombleValues[i];
+      source2D.features[i]["properties"]["womble_scaled"] =
+        generatedWombleValues[i] / maxWomble;
+      source3D.features[i]["properties"]["womble"] = generatedWombleValues[i];
+      source3D.features[i]["properties"]["womble_scaled"] =
+        generatedWombleValues[i] / maxWomble;
     }
   }
-  console.log("Feature Data?", wombleFeaturesData);
-  return wombleFeaturesData;
+  console.log("Feature Data?", source2D, source3D);
 }
 
 /**
@@ -99,70 +96,73 @@ function calculateWomble(edge) {
   }
 
   let womble = 0;
-
-  // Find the elements in the indicators csv array that corresponds to the edges neighbouring areas
-  let area1 = GlobalData.indicatorsData.find(
-    (area) => area[GlobalData.csvAreaCode] == edge["properties"]["sa1_id1"] // TODO: will have to update area code name, hardcoded to sa1_id1 for now
-  );
-
-  let area2 = GlobalData.indicatorsData.find(
-    (area) => area[GlobalData.csvAreaCode] == edge["properties"]["sa1_id2"] // TODO: will have to update area code name, hardcoded to sa1_id2 for now
-  );
-
-  // if either or both of the areas are undefined it means the indicators csv doesn't have data for that area and therefore we cannot calculate a womble value for that edge
-  if (area1 == undefined || area2 == undefined) {
-    console.log(`Indicators data not found for this edge`);
-    return null;
+  for (let i in selectedIndicators) {
+    womble += indicatorWeights[i] * edge.raw[selectedIndicators[i]];
   }
 
-  // actual womble calculation is done here
-  for (let i = 0; i < selectedIndicators.length; i++) {
-    // if an indicator value is found to not be a number, we can't calculate womble, communicate it to user. TODO: for now it prints to console, but we should print it to somewhere on the page
-    if (
-      isNaN(area1[selectedIndicators[i]]) ||
-      area1[selectedIndicators[i]] === null
-    ) {
-      console.log(
-        `Warning: Indicator value is not a number.
-        Found: area ID: ${area1[GlobalData.csvAreaCode]},
-        ${selectedIndicators[i]}: ${area1[selectedIndicators[i]]}`
-      );
-      return null;
-    }
-    if (
-      isNaN(area2[selectedIndicators[i]]) ||
-      area2[selectedIndicators[i]] === null
-    ) {
-      console.log(
-        `Warning: Indicator value is not a number.
-        Found: area ID: ${area2[GlobalData.csvAreaCode]},
-        ${selectedIndicators[i]}: ${area2[selectedIndicators[i]]}`
-      );
-      return null;
-    }
+  // // Find the elements in the indicators csv array that corresponds to the edges neighbouring areas
+  // let area1 = GlobalData.indicatorsData.find(
+  //   (area) => area[GlobalData.csvAreaCode] == edge["properties"]["sa1_id1"] // TODO: will have to update area code name, hardcoded to sa1_id1 for now
+  // );
 
-    if (document.getElementById("normalize-checkbox").checked) {
-      womble += indicatorWeights[i] * Math.abs(edge[selectedIndicators[i]]);
-      continue;
-    }
-    // womble += indicatorWeights[i] * absolute difference of (area1's selectedIndicator[i] value and area2's selectedIndicator[i] value)
-    if (isDistanceWeighted()) {
-      womble +=
-        (indicatorWeights[i] *
-          Math.abs(
-            parseFloat(area1[selectedIndicators[i]]) -
-              parseFloat(area2[selectedIndicators[i]])
-          )) /
-        edge["properties"]["distance"]; // divide by a distance property that we assume exists in the edge data
-    } else {
-      womble +=
-        indicatorWeights[i] *
-        Math.abs(
-          parseFloat(area1[selectedIndicators[i]]) -
-            parseFloat(area2[selectedIndicators[i]])
-        );
-    }
-  }
+  // let area2 = GlobalData.indicatorsData.find(
+  //   (area) => area[GlobalData.csvAreaCode] == edge["properties"]["sa1_id2"] // TODO: will have to update area code name, hardcoded to sa1_id2 for now
+  // );
+
+  // // if either or both of the areas are undefined it means the indicators csv doesn't have data for that area and therefore we cannot calculate a womble value for that edge
+  // if (area1 == undefined || area2 == undefined) {
+  //   console.log(`Indicators data not found for this edge`);
+  //   return null;
+  // }
+
+  // // actual womble calculation is done here
+  // for (let i = 0; i < selectedIndicators.length; i++) {
+  //   // if an indicator value is found to not be a number, we can't calculate womble, communicate it to user. TODO: for now it prints to console, but we should print it to somewhere on the page
+  //   if (
+  //     isNaN(area1[selectedIndicators[i]]) ||
+  //     area1[selectedIndicators[i]] === null
+  //   ) {
+  //     console.log(
+  //       `Warning: Indicator value is not a number.
+  //       Found: area ID: ${area1[GlobalData.csvAreaCode]},
+  //       ${selectedIndicators[i]}: ${area1[selectedIndicators[i]]}`
+  //     );
+  //     return null;
+  //   }
+  //   if (
+  //     isNaN(area2[selectedIndicators[i]]) ||
+  //     area2[selectedIndicators[i]] === null
+  //   ) {
+  //     console.log(
+  //       `Warning: Indicator value is not a number.
+  //       Found: area ID: ${area2[GlobalData.csvAreaCode]},
+  //       ${selectedIndicators[i]}: ${area2[selectedIndicators[i]]}`
+  //     );
+  //     return null;
+  //   }
+
+  //   if (document.getElementById("normalize-checkbox").checked) {
+  //     womble += indicatorWeights[i] * Math.abs(edge[selectedIndicators[i]]);
+  //     continue;
+  //   }
+  //   // womble += indicatorWeights[i] * absolute difference of (area1's selectedIndicator[i] value and area2's selectedIndicator[i] value)
+  //   if (isDistanceWeighted()) {
+  //     womble +=
+  //       (indicatorWeights[i] *
+  //         Math.abs(
+  //           parseFloat(area1[selectedIndicators[i]]) -
+  //             parseFloat(area2[selectedIndicators[i]])
+  //         )) /
+  //       edge["properties"]["distance"]; // divide by a distance property that we assume exists in the edge data
+  //   } else {
+  //     womble +=
+  //       indicatorWeights[i] *
+  //       Math.abs(
+  //         parseFloat(area1[selectedIndicators[i]]) -
+  //           parseFloat(area2[selectedIndicators[i]])
+  //       );
+  //   }
+  // }
   return womble;
 }
 

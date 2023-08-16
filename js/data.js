@@ -6,36 +6,36 @@ import {
   rankDataColumns,
 } from "./util/normalise.js";
 import { showLoader } from "./interface/loader.js";
+import { yieldToMain } from "./util/yield.js";
 export class GlobalData {
-  static geojsonAreaCode;
-  // stores the user's selected variables for running the womble calc
-  static selectedVariables;
-  // another global to store the dimension that the app is currently in (2d or 3d)
+  // The dimension that the app is currently in (2d or 3d)
   static appDimension = Dimensions.TWO_D;
+  // AREAS
+  // Area code column name
+  static geojsonAreaCode;
 
+  //// INDICATORS
+  // Array storing the indicator data
   static indicatorsData;
+  // The name of the column containing the IDs (for example: sa1)
+  static csvAreaID;
+  // Headers of each indicator column
+  static indicatorsHeaders;
 
-  static optionsData;
-
-  static csvAreaCode;
-
-  static originalIndicatorsData;
-
+  // Buffered and Unbuffered datasets
   static selectedUnbuffered;
-
   static selectedBuffered;
 
-  static selecteedAreas;
-
-  static getWombleIndicators(optionsArray) {
+  // Stores the user's selected variables for running the womble calc
+  static selectedVariables;
+  static getWombleIndicators() {
     let values = [];
-    for (let i = 0; i < optionsArray.length; i++) {
+    for (let i = 0; i < GlobalData.indicatorsHeaders.length; i++) {
       let currentVariable = document.getElementById(`variable-${i}`);
-
       if (currentVariable.checked) {
         // make indicator slider visisble
         // createIndicatorSliders(currentVariable.innerText, i);
-        values.push(optionsArray[i]);
+        values.push(GlobalData.indicatorsHeaders[i]);
       }
     }
     return values;
@@ -48,12 +48,10 @@ export class GlobalData {
  */
 export async function setIndicatorsData(data) {
   await showLoader(true, "Starting data preprocessing");
-
-  GlobalData.originalIndicatorsData = JSON.parse(JSON.stringify(data.data));
-  GlobalData.indicatorsData = JSON.parse(JSON.stringify(data.data));
+  GlobalData.indicatorsData = data.data;
   let headers = Object.keys(data.data[0]);
-  GlobalData.csvAreaCode = headers.shift();
-  GlobalData.optionsData = headers;
+  GlobalData.csvAreaID = headers.shift();
+  GlobalData.indicatorsHeaders = headers;
 
   // Normalise everything?
   console.log("Indicators Data", GlobalData.indicatorsData);
@@ -78,7 +76,6 @@ export async function setIndicatorsData(data) {
       boundary["raw"][header] = Math.abs(row1[header] - row2[header]);
     }
   }
-
   for (let i in GlobalData.selectedBuffered.features) {
     let boundary = GlobalData.selectedBuffered.features[i];
     let row1 = GlobalData.indicatorsData.find(
@@ -92,19 +89,19 @@ export async function setIndicatorsData(data) {
       boundary["raw"][header] = Math.abs(row1[header] - row2[header]);
     }
   }
-  await showLoader(true, "Performing data scaling.");
+
+  await showLoader(true, "Performing data scaling");
   // SCALE EVERY BOUNDARY
-  setTimeout;
-  await scaleDataColumns(GlobalData.selectedUnbuffered.features, headers);
-  await scaleDataColumns(GlobalData.selectedBuffered.features, headers);
+  scaleDataColumns(GlobalData.selectedUnbuffered.features, headers);
+  scaleDataColumns(GlobalData.selectedBuffered.features, headers);
 
-  await showLoader(true, "Performing data normalisation.");
-  await normaliseDataColumns(GlobalData.selectedUnbuffered.features, headers);
-  await normaliseDataColumns(GlobalData.selectedBuffered.features, headers);
+  await showLoader(true, "Performing data normalisation");
+  normaliseDataColumns(GlobalData.selectedUnbuffered.features, headers);
+  normaliseDataColumns(GlobalData.selectedBuffered.features, headers);
 
-  await showLoader(true, "Performing data ranking.");
-  await rankDataColumns(GlobalData.selectedUnbuffered.features, headers);
-  await rankDataColumns(GlobalData.selectedBuffered.features, headers);
+  await showLoader(true, "Performing data ranking");
+  rankDataColumns(GlobalData.selectedUnbuffered.features, headers);
+  rankDataColumns(GlobalData.selectedBuffered.features, headers);
 
   console.log("ALL BOUNDARIES UNBUFFERED", GlobalData.selectedUnbuffered);
   console.log("ALL BOUNDARIES BUFFERED", GlobalData.selectedBuffered);

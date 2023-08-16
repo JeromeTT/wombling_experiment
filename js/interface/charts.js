@@ -1,14 +1,35 @@
-export function histogram(
+export function histogram({
   data,
   parent,
   scale = 4,
   flipped = false,
-  thresholds = 10
-) {
+  thresholds = 10,
+  reference = (d) => d,
+  datapoint = null,
+}) {
   const width = 1000;
   const height = width / scale;
-  const bins = d3.bin().thresholds(thresholds)(data);
-  console.log(bins);
+  const f = reference;
+  const bins = d3
+    .bin()
+    .thresholds((data, min, max) =>
+      d3.range(thresholds).map((t) => min + (t / thresholds) * (max - min))
+    )
+    .value(f)(data);
+
+  if (datapoint) {
+    //Check which bucket it is
+    for (let bin of bins) {
+      console.log("hmm", f(datapoint), bin.x1);
+      if (f(datapoint) <= bin.x1) {
+        console.log(true);
+        bin.contains = true;
+        // it is in this bin
+        break;
+      }
+    }
+  }
+
   // Declare the x (horizontal position) scale.
   const x = d3
     .scaleLinear()
@@ -35,11 +56,11 @@ export function histogram(
   // Add a rect for each bin.
   svg
     .append("g")
-    .attr("fill", "steelblue")
     .selectAll()
     .data(bins)
     .join("rect")
     .attr("x", (d) => x(d.x0) + 1)
+    .attr("fill", (d) => (d.contains ? "red" : "steelblue"))
     .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
     .attr("y", (d) => 0)
     .attr("height", (d) => y(0) - y(d.length));

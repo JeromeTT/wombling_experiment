@@ -1,6 +1,8 @@
 import { closeExistingPopups } from "../popups.js";
 import { GlobalData } from "../../data.js";
 import { initLayer } from "./map.js";
+import { histogram } from "../charts.js";
+import { retrieveIndicatorSliders } from "../../sliders.js";
 export function addBoundariesLayer(map) {
   initLayer(map, "boundariesSource");
 }
@@ -21,7 +23,7 @@ export function initClickableWallBehaviour(map) {
     // raw and scaled womble values rounded to 3 dec places
     let rawWomble = wall.properties.womble.toFixed(3);
     let scaledWomble = wall.properties.womble_scaled.toFixed(3);
-    let description = `Raw womble: ${rawWomble} <br> Scaled womble: ${scaledWomble} <br> Neighbouring area IDs: <br> ${wall.properties.sa1_id1}, <br> ${wall.properties.sa1_id2}`;
+    let description = `Raw womble: ${rawWomble} <br> Scaled womble: ${scaledWomble} <br> Neighbouring area IDs: <br> ${wall.properties.sa1_id1}, <br> ${wall.properties.sa1_id2} <div class="popup-charts"></div>`;
     console.log(wall);
 
     // area IDs are converted to strings b/c they'll be compared to the SA1 area properties which are strings
@@ -42,6 +44,24 @@ export function initClickableWallBehaviour(map) {
       closeExistingPopups(map);
       // map.setFilter("areas", ["boolean", false]);
     });
+
+    let parent = document.querySelector(
+      ".wall-popup .mapboxgl-popup-content .popup-charts"
+    );
+    const weights = retrieveIndicatorSliders();
+    for (let i in GlobalData.selectedVariables) {
+      let variable = GlobalData.selectedVariables[i];
+      let weight = parseFloat(weights[i].value) / 100;
+      const innerP = parent.appendChild(document.createElement("p"));
+      innerP.textContent = `${variable} [Weighted: ${weight}%]`;
+      const innerDiv = parent.appendChild(document.createElement("div"));
+      histogram({
+        data: GlobalData.selectedBuffered.features,
+        parent: innerDiv,
+        reference: (d) => d.properties[variable],
+        datapoint: wall,
+      });
+    }
 
     // highlights the neighbouring areas
     // uses setFilter to display only the features in the "areas" layer which match the area IDs adjacent to the clicked wall
@@ -72,7 +92,7 @@ export function initClickableAreaBehaviour(map) {
     // find indicators that correspond with the area that was clicked on
     let correspondingIndicators = GlobalData.indicatorsData.find(
       (indicators) => {
-        let indicatorsCode = indicators[GlobalData.csvAreaCode]; // csvAreaCode is global and initialised in setIndicatorsData()
+        let indicatorsCode = indicators[GlobalData.csvAreaID]; // csvAreaCode is global and initialised in setIndicatorsData()
 
         // if code is a number, convert it to string
         if (!isNaN(indicatorsCode)) {

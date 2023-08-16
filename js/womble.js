@@ -15,9 +15,7 @@ import { showLoader } from "./interface/loader.js";
  */
 export function runWomble(map, source2D, source3D) {
   closeExistingPopups(map);
-  GlobalData.selectedVariables = GlobalData.getWombleIndicators(
-    GlobalData.optionsData
-  );
+  GlobalData.selectedVariables = GlobalData.getWombleIndicators();
   generateWombleFeaturesData(source2D, source3D);
   initSource(
     map,
@@ -36,10 +34,9 @@ export function runWomble(map, source2D, source3D) {
     "wallsSource2D"
   );
 
-  runAllInputHandlers(map);
-  // hide boundaries directly after running womble
+  // Hide boundaries directly after running womble
   document.getElementById("boundaries-checkbox").checked = false;
-  map.setLayoutProperty("boundaries", "visibility", "none");
+  runAllInputHandlers(map);
 }
 
 /**
@@ -51,31 +48,37 @@ export function runWomble(map, source2D, source3D) {
  */
 function generateWombleFeaturesData(source2D, source3D) {
   let generatedWombleValues = [];
+  let sliders = retrieveIndicatorSliders();
   // create array of womble values for each edge
   for (let edge of source2D["features"]) {
-    generatedWombleValues.push(calculateWomble(edge));
+    generatedWombleValues.push(calculateWomble(edge, sliders));
   }
 
   // handling the case where the max womble is somehow zero, i dont think this should ever happen
-  let maxWomble = Math.max(...generatedWombleValues);
+  let maxWomble = d3.max(generatedWombleValues, (d) => d.womble);
   if (maxWomble == 0) {
     console.log("Max womble value in this data set is zero");
     showLoader(true, "Error: Max womble = 0");
     return;
   }
 
-  histogram(generatedWombleValues, ".dual-slider-overview");
+  histogram({
+    data: generatedWombleValues,
+    parent: ".dual-slider-overview",
+    reference: (d) => d.womble,
+  });
   // Assign the values in place
-  for (let i = 0; i < source2D.features.length; i++) {
-    if (generatedWombleValues[i] != null) {
-      source2D.features[i]["properties"]["womble"] = generatedWombleValues[i];
-      source2D.features[i]["properties"]["womble_scaled"] =
-        generatedWombleValues[i] / maxWomble;
-      source3D.features[i]["properties"]["womble"] = generatedWombleValues[i];
-      source3D.features[i]["properties"]["womble_scaled"] =
-        generatedWombleValues[i] / maxWomble;
+  for (let i in generatedWombleValues) {
+    for (let [key, value] of Object.entries(generatedWombleValues[i])) {
+      source2D.features[i]["properties"][key] = value;
+      source3D.features[i]["properties"][key] = value;
     }
+    source3D.features[i]["properties"]["womble_scaled"] =
+      source3D.features[i]["properties"]["womble"] / maxWomble;
+    source2D.features[i]["properties"]["womble_scaled"] =
+      source2D.features[i]["properties"]["womble"] / maxWomble;
   }
+
   console.log("Feature Data?", source2D, source3D);
 }
 
@@ -84,20 +87,19 @@ function generateWombleFeaturesData(source2D, source3D) {
  * @param {Number} edge object corresponding to the edge that the womble calculation is being done for
  * @returns {Number} womble value
  */
-function calculateWomble(edge) {
-  let sliders = retrieveIndicatorSliders();
-
+function calculateWomble(edge, sliders) {
   // retrieve the user's selected indicator names and weights
   let selectedIndicators = [];
   let indicatorWeights = [];
+  let featureList = { womble: 0 };
   for (let slider of sliders) {
     selectedIndicators.push(slider.getAttribute("indicatorname")); // each slider was previously created with an "indicatorname" attribute
     indicatorWeights.push(parseFloat(slider.value) / 100); // divide by 100 b/c the slider values are percentages
   }
 
-  let womble = 0;
   for (let i in selectedIndicators) {
-    womble += indicatorWeights[i] * edge.raw[selectedIndicators[i]];
+    featureList[selectedIndicators[i]] = edge.raw[selectedIndicators[i]];
+    featureList.womble += indicatorWeights[i] * edge.raw[selectedIndicators[i]];
   }
 
   // // Find the elements in the indicators csv array that corresponds to the edges neighbouring areas
@@ -163,7 +165,7 @@ function calculateWomble(edge) {
   //       );
   //   }
   // }
-  return womble;
+  return featureList;
 }
 
 /**

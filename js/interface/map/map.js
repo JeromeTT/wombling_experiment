@@ -42,9 +42,9 @@ export function initLayer(map, sourceID) {
         type: "fill",
         paint: {
           "fill-color": "blue",
-          "fill-opacity": 0.05,
+          "fill-opacity": 0,
         },
-        //filter: ["boolean", true], // initialise filter to show no features by setting false
+        filter: ["boolean", false], // initialise filter to show no features by setting false
       };
       break;
     case "wallsSource2D":

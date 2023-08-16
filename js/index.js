@@ -21,6 +21,7 @@ import { addStyleListeners } from "./styleOptions.js";
 
 import { initLegend as initLegend } from "./interface/legend.js";
 import { GlobalData } from "./data.js";
+import { changeBG } from "./upload.js";
 
 // Could also use fetch instead of import
 // fetch("./boundaries_SA1_2016.geojson")
@@ -71,6 +72,10 @@ export function areaDropDownHandler(map) {
 
 //// MAIN ////
 // Main map object definition
+let uploadBtn = document.querySelector("#csvInput");
+
+uploadBtn.addEventListener("change", changeBG);
+
 let map = new mapboxgl.Map({
   container: "map",
   center: [144.9628, -37.8102], // long lat of melb

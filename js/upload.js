@@ -1,11 +1,9 @@
 import { setIndicatorsData } from "./data.js";
 import Papa from "https://cdn.skypack.dev/papaparse@5.3.0";
 
-let uploadBtn = document.querySelector("#csvInput");
-const customTxt = document.getElementById("custom-text");
-uploadBtn.addEventListener("change", changeBG);
-
-function changeBG(e) {
+export function changeBG(e) {
+  const customTxt = document.getElementById("custom-text");
+  let uploadBtn = document.querySelector("#csvInput");
   e.preventDefault();
   if (uploadBtn.value) {
     customTxt.innerHTML = uploadBtn.value.match(

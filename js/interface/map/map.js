@@ -29,7 +29,7 @@ export function initLayer(map, sourceID) {
         id: "boundaries", // this needs to be unique
         type: "line",
         paint: {
-          "line-color": "black",
+          "line-color": "grey",
           "line-width": 0.2,
         },
       };
@@ -42,7 +42,7 @@ export function initLayer(map, sourceID) {
         type: "fill",
         paint: {
           "fill-color": "blue",
-          "fill-opacity": 0.21,
+          "fill-opacity": 0.05,
         },
         //filter: ["boolean", true], // initialise filter to show no features by setting false
       };

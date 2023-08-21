@@ -51,7 +51,7 @@ export function initClickableWallBehaviour(map) {
     const weights = retrieveIndicatorSliders();
     for (let i in GlobalData.selectedVariables) {
       let variable = GlobalData.selectedVariables[i];
-      let weight = parseFloat(weights[i].value) / 100;
+      let weight = parseFloat(weights[i].value);
       const innerP = parent.appendChild(document.createElement("p"));
       innerP.textContent = `${variable} [Weighted: ${weight}%]`;
       const innerDiv = parent.appendChild(document.createElement("div"));

@@ -1,9 +1,4 @@
-// import { csvArray, csvToArr} from './upload.js';
-
-function createIndicatorOptions(optionsArray, select_id) {
-  // if (csvArray.Property == null) {
-
-  // console.log(optionsArray);
+export function createIndicatorOptions(optionsArray, select_id) {
   var x = document.getElementById(select_id);
 
   for (let i = 0; i < optionsArray.length; i++) {
@@ -16,7 +11,6 @@ function createIndicatorOptions(optionsArray, select_id) {
   for (var i = 0; i < optionsTest.length; i++) {
     console.log(optionsTest[i].value);
   }
-  // }
 }
 
 function removeIndicatorOptions() {
@@ -34,19 +28,9 @@ function removeIndicatorOptions() {
 
 // Return an array of the selected option values
 // select is an HTML select element
-function gyug(select_id) {
-  var options = document.getElementById(select_id).selectedOptions;
-  var values = Array.from(options).map(({ value }) => value);
-  console.log(values);
-  return values;
-}
-
-function getValues(select_id) {
+export function getValues(select_id) {
   var options = document.getElementById(select_id).options;
   var values = Array.from(options).map(({ value }) => value);
   console.log(values);
   return values;
 }
-
-// Exporting variables and functions
-export { createIndicatorOptions, removeIndicatorOptions, getValues };

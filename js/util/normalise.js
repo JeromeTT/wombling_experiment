@@ -1,3 +1,8 @@
+/**
+ * Scales the data provided to between values of 0 and 1.
+ * @param {*} data TODO
+ * @param {*} headers headers containing which attributes need to be normalised
+ */
 export async function scaleDataColumns(data, headers) {
   for (let colName of headers) {
     // Find maximum of column
@@ -16,7 +21,11 @@ export async function scaleDataColumns(data, headers) {
     });
   }
 }
-
+/**
+ * Normalised the data provided to between values of 0 and 1.
+ * @param {*} data TODO
+ * @param {*} headers headers containing which attributes need to be normalised
+ */
 export async function normaliseDataColumns(data, headers) {
   // Fit each column to a distribution?
   // EXPONENTIAL: requires the mean
@@ -44,7 +53,11 @@ export async function normaliseDataColumns(data, headers) {
     }
   }
 }
-
+/**
+ * TODO
+ * @param {*} data TODO
+ * @param {*} headers headers containg which attributes need to be ranked.
+ */
 export async function rankDataColumns(data, headers) {
   let dataCopy = data;
   let len = data.length;
@@ -68,12 +81,22 @@ export async function rankDataColumns(data, headers) {
     }
   }
 }
+/**
+ * Exponential CDF function.
+ * @param {*} lambda lambda parameter in exponential function
+ * @returns corresponding CDF function given lambda
+ */
 export function exponentialCDF(lambda) {
   return function (x) {
     return 1 - Math.E ** (-1 * lambda * x);
   };
 }
 
+/**
+ * Exponential PDF function.
+ * @param {*} lambda lambda parameter in exponential function
+ * @returns corresponding CDF function given lambda
+ */
 export function exponentialPDF(lambda) {
   function PDF(x) {
     return lambda * Math.E ** (-lambda * x);

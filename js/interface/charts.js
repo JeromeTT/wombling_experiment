@@ -1,3 +1,7 @@
+/**
+ * Utilised D3.js to draw a histogram
+ * @param {*} param0 TODO
+ */
 export function histogram({
   data,
   parent,
@@ -12,7 +16,7 @@ export function histogram({
   const f = reference;
   const bins = d3
     .bin()
-    .thresholds((data, min, max) =>
+    .thresholds((_, min, max) =>
       d3.range(thresholds).map((t) => min + (t / thresholds) * (max - min))
     )
     .value(f)(data);
@@ -20,9 +24,7 @@ export function histogram({
   if (datapoint) {
     //Check which bucket it is
     for (let bin of bins) {
-      console.log("hmm", f(datapoint), bin.x1);
       if (f(datapoint) <= bin.x1) {
-        console.log(true);
         bin.contains = true;
         // it is in this bin
         break;

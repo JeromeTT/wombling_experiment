@@ -1,8 +1,6 @@
-import { setDefaultWeights } from "./sliders.js";
-import {
-  initClickableAreaBehaviour,
-  initClickableWallBehaviour,
-} from "./interface/map/boundaries.js";
+import { setDefaultWeights } from "./interface/menu/indicators/sliders.js";
+import { initClickableWallBehaviour } from "./interface/map/boundaries.js";
+import { initClickableAreaBehaviour } from "./interface/map/areas.js";
 import { closeExistingPopups } from "./interface/popups.js";
 import { runWomble, DimensionToggle } from "./womble.js";
 import boundaries_SA1_2011_buffered from "../boundaries_SA1_2011_dist_wgs84_buffered7.geojson" assert { type: "json" };
@@ -19,8 +17,8 @@ import { initSource } from "./interface/map/map.js";
 import { menuInitCollapsibleBehaviour } from "./interface/menu/menu.js";
 import { addStyleListeners } from "./styleOptions.js";
 
-import { initLegend as initLegend } from "./interface/legend.js";
-import { GlobalData } from "./data.js";
+import { initLegend as initLegend } from "./interface/map/legend.js";
+import { GlobalData } from "./data/globaldata.js";
 import { changeBG } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
 
@@ -55,6 +53,11 @@ export function areaDropDownHandler(map) {
   GlobalData.selectedBuffered = areaTypes[selection].buffered;
   let selectedAreas = areaTypes[selection].areas;
   GlobalData.geojsonAreaCode = areaTypes[selection].areaCodeProp;
+
+  // Assign area ids
+  for (let feature of selectedAreas.features) {
+    feature.id = feature.properties[GlobalData.geojsonAreaCode];
+  }
 
   // Re-init map boundaries
   console.log(selectedAreas);
@@ -108,6 +111,7 @@ resetWeightsButton.addEventListener("click", setDefaultWeights);
 
 // When map loads, do...
 map.on("load", () => {
+  console.log("Loaded");
   document.getElementById("areasSelect").addEventListener("change", () => {
     areaDropDownHandler(map);
   });
@@ -130,6 +134,12 @@ runWombleButton.addEventListener("click", async () => {
   // Draw walls if in 3d mode, using buffered source (polygon features)
   runWomble(map, GlobalData.selectedUnbuffered, GlobalData.selectedBuffered);
 
+  // Toggle boundary selection mode
+  if (GlobalData.edgeSelectionMode) {
+    map.setFilter("areas", ["boolean", true]);
+  } else {
+    map.setFilter("areas", ["boolean", false]);
+  }
   await showLoader(false);
 });
 

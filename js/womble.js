@@ -1,9 +1,9 @@
-import { retrieveIndicatorSliders } from "./sliders.js";
-import { Dimensions } from "./enums.js";
+import { retrieveIndicatorSliders } from "./interface/menu/indicators/sliders.js";
+import { Dimensions } from "./util/enums.js";
 import { closeExistingPopups } from "./interface/popups.js";
 import { runAllInputHandlers } from "./filter.js";
 import { histogram } from "./interface/charts.js";
-import { GlobalData } from "./data.js";
+import { GlobalData } from "./data/globaldata.js";
 import { initSource } from "./interface/map/map.js";
 import { showLoader } from "./interface/loader.js";
 
@@ -14,7 +14,6 @@ import { showLoader } from "./interface/loader.js";
  * @param {*} source geojson source for the boundaries upon which walls will be drawn
  */
 export function runWomble(map, source2D, source3D) {
-  closeExistingPopups(map);
   GlobalData.selectedVariables = GlobalData.getWombleIndicators();
   generateWombleFeaturesData(source2D, source3D);
   initSource(
@@ -37,6 +36,7 @@ export function runWomble(map, source2D, source3D) {
   // Hide boundaries directly after running womble
   document.getElementById("boundaries-checkbox").checked = false;
   runAllInputHandlers(map);
+  closeExistingPopups(map);
 }
 
 /**
@@ -78,7 +78,6 @@ function generateWombleFeaturesData(source2D, source3D) {
     source2D.features[i]["properties"]["womble_scaled"] =
       source2D.features[i]["properties"]["womble"] / maxWomble;
   }
-
   console.log("Feature Data?", source2D, source3D);
 }
 
@@ -96,75 +95,16 @@ function calculateWomble(edge, sliders) {
     selectedIndicators.push(slider.getAttribute("indicatorname")); // each slider was previously created with an "indicatorname" attribute
     indicatorWeights.push(parseFloat(slider.value) / 100); // divide by 100 b/c the slider values are percentages
   }
-
-  for (let i in selectedIndicators) {
-    featureList[selectedIndicators[i]] = edge.raw[selectedIndicators[i]];
-    featureList.womble += indicatorWeights[i] * edge.raw[selectedIndicators[i]];
+  let stat = edge.raw;
+  if (document.getElementById("normalize-checkbox").checked) {
+    stat = edge.normalised;
+  } else if (document.getElementById("rank-checkbox").checked) {
+    stat = edge.rank;
   }
-
-  // // Find the elements in the indicators csv array that corresponds to the edges neighbouring areas
-  // let area1 = GlobalData.indicatorsData.find(
-  //   (area) => area[GlobalData.csvAreaCode] == edge["properties"]["sa1_id1"] // TODO: will have to update area code name, hardcoded to sa1_id1 for now
-  // );
-
-  // let area2 = GlobalData.indicatorsData.find(
-  //   (area) => area[GlobalData.csvAreaCode] == edge["properties"]["sa1_id2"] // TODO: will have to update area code name, hardcoded to sa1_id2 for now
-  // );
-
-  // // if either or both of the areas are undefined it means the indicators csv doesn't have data for that area and therefore we cannot calculate a womble value for that edge
-  // if (area1 == undefined || area2 == undefined) {
-  //   console.log(`Indicators data not found for this edge`);
-  //   return null;
-  // }
-
-  // // actual womble calculation is done here
-  // for (let i = 0; i < selectedIndicators.length; i++) {
-  //   // if an indicator value is found to not be a number, we can't calculate womble, communicate it to user. TODO: for now it prints to console, but we should print it to somewhere on the page
-  //   if (
-  //     isNaN(area1[selectedIndicators[i]]) ||
-  //     area1[selectedIndicators[i]] === null
-  //   ) {
-  //     console.log(
-  //       `Warning: Indicator value is not a number.
-  //       Found: area ID: ${area1[GlobalData.csvAreaCode]},
-  //       ${selectedIndicators[i]}: ${area1[selectedIndicators[i]]}`
-  //     );
-  //     return null;
-  //   }
-  //   if (
-  //     isNaN(area2[selectedIndicators[i]]) ||
-  //     area2[selectedIndicators[i]] === null
-  //   ) {
-  //     console.log(
-  //       `Warning: Indicator value is not a number.
-  //       Found: area ID: ${area2[GlobalData.csvAreaCode]},
-  //       ${selectedIndicators[i]}: ${area2[selectedIndicators[i]]}`
-  //     );
-  //     return null;
-  //   }
-
-  //   if (document.getElementById("normalize-checkbox").checked) {
-  //     womble += indicatorWeights[i] * Math.abs(edge[selectedIndicators[i]]);
-  //     continue;
-  //   }
-  //   // womble += indicatorWeights[i] * absolute difference of (area1's selectedIndicator[i] value and area2's selectedIndicator[i] value)
-  //   if (isDistanceWeighted()) {
-  //     womble +=
-  //       (indicatorWeights[i] *
-  //         Math.abs(
-  //           parseFloat(area1[selectedIndicators[i]]) -
-  //             parseFloat(area2[selectedIndicators[i]])
-  //         )) /
-  //       edge["properties"]["distance"]; // divide by a distance property that we assume exists in the edge data
-  //   } else {
-  //     womble +=
-  //       indicatorWeights[i] *
-  //       Math.abs(
-  //         parseFloat(area1[selectedIndicators[i]]) -
-  //           parseFloat(area2[selectedIndicators[i]])
-  //       );
-  //   }
-  // }
+  for (let i in selectedIndicators) {
+    featureList[selectedIndicators[i]] = stat[selectedIndicators[i]];
+    featureList.womble += indicatorWeights[i] * stat[selectedIndicators[i]];
+  }
   return featureList;
 }
 
@@ -236,7 +176,8 @@ export class DimensionToggle {
     map.setLayoutProperty("walls2D", "visibility", "none");
     map.setLayoutProperty("walls3D", "visibility", "visible");
     // Change the radio label to height only
-    document.getElementById("height-check-label").innerText = "Show Wall eight";
+    document.getElementById("height-check-label").innerText =
+      "Show Wall Height";
   }
 
   #switchTo2d(map) {

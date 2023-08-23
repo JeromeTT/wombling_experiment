@@ -1,5 +1,5 @@
-import { DEFAULT } from "../enums.js";
-import { getColorScale, getWombleScale } from "../util/scale.js";
+import { DEFAULT } from "../../util/enums.js";
+import { getColorScale, getWombleScale } from "../../util/scale.js";
 /**
  * Appends the map legend to the HTML.
  */

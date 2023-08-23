@@ -4,6 +4,13 @@ import {
   getVariableWidthExpression,
 } from "../../expressions.js";
 
+/**
+ * Adds the source and corresponding layer to the map.
+ * @param {*} map the map object the source and layer is added to
+ * @param {*} sourceData raw feature data
+ * @param {*} sourceID the name of the source
+ * @returns
+ */
 export function initSource(map, sourceData, sourceID) {
   // If source exists, simply update the data
   if (map.getSource(sourceID)) {
@@ -18,6 +25,11 @@ export function initSource(map, sourceData, sourceID) {
   initLayer(map, sourceID);
 }
 
+/**
+ * Adds the layer to the corresponding source.
+ * @param {*} map the map object which the layer is added to
+ * @param {*} sourceID source to add the layer
+ */
 export function initLayer(map, sourceID) {
   // Layer defines how to display the source
   let layer = { source: sourceID };
@@ -41,8 +53,22 @@ export function initLayer(map, sourceID) {
         id: "areas", // this needs to be unique
         type: "fill",
         paint: {
-          "fill-color": "blue",
-          "fill-opacity": 0,
+          "fill-color": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "red",
+            ["boolean", ["feature-state", "neighbour"], false],
+            "lightgreen",
+            "blue",
+          ],
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            0.2,
+            ["boolean", ["feature-state", "neighbour"], false],
+            0.2,
+            0,
+          ],
         },
         filter: ["boolean", false], // initialise filter to show no features by setting false
       };

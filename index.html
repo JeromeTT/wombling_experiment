@@ -25,6 +25,7 @@
   </head>
 
   <body>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <!-- Map goes in here -->
     <div id="map"></div>
@@ -75,6 +76,13 @@
           <div id="womble-indicators-buttons" class="hide">
             <div class="womble-indicators-buttons-container">
               <hr />
+              <button id="deselect-all-button" class="womble-indicators-button">
+                Deselect All
+              </button>
+              <button id="select-all-button" class="womble-indicators-button">
+                Select All
+              </button>
+
               <label class="checkbox-container" for="distance-weight-checkbox"
                 >Distance Weight
                 <input type="checkbox" id="distance-weight-checkbox" />
@@ -84,6 +92,12 @@
               <label class="checkbox-container" for="normalize-checkbox"
                 >Normalise
                 <input type="checkbox" id="normalize-checkbox" />
+                <span class="checkmark"></span>
+              </label>
+
+              <label class="checkbox-container" for="rank-checkbox"
+                >Ranked
+                <input type="checkbox" id="rank-checkbox" />
                 <span class="checkmark"></span>
               </label>
 
@@ -199,22 +213,14 @@
 
         <h5>Dev Tools</h5>
 
-        <label class="checkbox-container" id="toggle-edge-selection-checkbox">
+        <label
+          class="checkbox-container"
+          id="toggle-edge-selection-checkbox-div"
+        >
           Toggle Edge Selection Mode
           <input
             type="checkbox"
-            id="height-checkbox"
-            checked="checked"
-            name="view"
-          />
-          <span class="checkmark"></span>
-        </label>
-
-        <label class="checkbox-container" id="toggle-edge-selection-checkbox">
-          Toggle Edge Selection Mode
-          <input
-            type="checkbox"
-            id="height-checkbox"
+            id="toggle-edge-selection-checkbox"
             checked="checked"
             name="view"
           />

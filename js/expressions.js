@@ -1,4 +1,4 @@
-import { DEFAULT } from "./enums.js";
+import { DEFAULT } from "./util/enums.js";
 import { getColorScale, getWombleScale } from "./util/scale.js";
 
 export function getColourExpression() {

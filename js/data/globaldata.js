@@ -1,12 +1,15 @@
-import { Dimensions } from "./enums.js";
-import { createVariables } from "./variableOptions.js";
+import { Dimensions } from "../util/enums.js";
+import { createVariables } from "../interface/menu/indicators/variableOptions.js";
 import {
   normaliseDataColumns,
   scaleDataColumns,
   rankDataColumns,
-} from "./util/normalise.js";
-import { showLoader } from "./interface/loader.js";
-import { yieldToMain } from "./util/yield.js";
+} from "../util/normalise.js";
+import { showLoader } from "../interface/loader.js";
+
+/**
+ * Global data object.
+ */
 export class GlobalData {
   // The dimension that the app is currently in (2d or 3d)
   static appDimension = Dimensions.TWO_D;
@@ -40,6 +43,9 @@ export class GlobalData {
     }
     return values;
   }
+
+  static edgeSelectionMode = true;
+  static selectedArea = { area: null, neighbours: new Set() };
 }
 
 /**

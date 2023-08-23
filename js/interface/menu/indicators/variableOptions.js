@@ -4,22 +4,14 @@ var firstUpload = true;
 
 export function createVariables(optionsArray) {
   const divID = document.getElementById("options");
-
   if (!firstUpload) {
     while (divID.firstChild) {
       divID.removeChild(divID.lastChild);
     }
   }
-
   for (let i = 0; i < optionsArray.length; i++) {
-    // let option = document.createElement("INPUT");
-    // option.setAttribute("type", "checkbox");
-    // option.setAttribute("id", `variable-${i}`)
-
     var node = document.createElement("div");
     node.setAttribute("class", "form-check");
-    // node.innerHTML = '<input type="checkbox" id="variable-' + i + '" name="check' + i + '"><label class = "checkbox-container"  for="variable-' + i + '">' + optionsArray[i] + '</label>';
-
     node.innerHTML =
       '<label class = "checkbox-container"  for="variable-' +
       i +
@@ -38,18 +30,16 @@ export function createVariables(optionsArray) {
     // add event listener to each checkbox
     let checkbox = document.getElementById(`variable-${i}`);
     checkbox.addEventListener("click", variableCheckboxHandler);
-
-    // setTimeout(function () {$('#' + gear.id).selectpicker();}, 300)
   }
-
   firstUpload = false;
+  document.getElementById("womble-indicators-buttons").classList.remove("hide");
 }
 
 /**
  * When a variable checkbox is clicked, all variables checkboxes are scanned.
  * Indicator sliders are created for all checkboxes that are checked.
  */
-function variableCheckboxHandler() {
+export function variableCheckboxHandler() {
   let selectedVariables = [];
   let optionsDiv = document.getElementById("options");
 

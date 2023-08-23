@@ -1,11 +1,12 @@
-import { GlobalData } from "./data.js";
-import { Dimensions, LightModes } from "./enums.js";
+import { GlobalData } from "./data/globaldata.js";
+import { Dimensions, LightModes } from "./util/enums.js";
 import {
   getColourExpression,
   getConstantWidthExpression,
   getHeightExpression,
   getVariableWidthExpression,
 } from "./expressions.js";
+import { variableCheckboxHandler } from "./interface/menu/indicators/variableOptions.js";
 
 export function addInputListeners(map) {
   // each element in this array corresponds to some sort of option that the user has
@@ -26,6 +27,13 @@ export function addInputListeners(map) {
     },
     { id: "min-slider", handler: minMaxSliderHandler, event: "input" },
     { id: "max-slider", handler: minMaxSliderHandler, event: "input" },
+    {
+      id: "toggle-edge-selection-checkbox",
+      handler: edgeSelectionHandler,
+      event: "click",
+    },
+    { id: "select-all-button", handler: selectAllHandler, event: "click" },
+    { id: "deselect-all-button", handler: selectNoneHandler, event: "click" },
   ];
 
   // add event listeners for each option element
@@ -46,6 +54,7 @@ export function runAllInputHandlers(map) {
     transparencySliderHandler,
     minMaxSliderHandler,
     dimensionHandler,
+    edgeSelectionHandler,
   ];
 
   for (let handler of inputHandlers) {
@@ -265,4 +274,37 @@ export class darkModeToggle {
     this._container.parentNode.removeChild(this._container);
     this._map = undefined;
   }
+}
+
+function edgeSelectionHandler(map) {
+  let checked = document.getElementById(
+    "toggle-edge-selection-checkbox"
+  ).checked;
+  GlobalData.edgeSelectionMode = checked;
+  map.setFilter("areas", ["boolean", checked]);
+}
+
+function selectAllHandler(map) {
+  let i = 0;
+  while (true) {
+    let next = document.getElementById("variable-" + i);
+    if (next == null || next == undefined) {
+      break;
+    }
+    next.checked = true;
+    i++;
+  }
+  variableCheckboxHandler();
+}
+function selectNoneHandler(map) {
+  let i = 0;
+  while (true) {
+    let next = document.getElementById("variable-" + i);
+    if (next == null || next == undefined) {
+      break;
+    }
+    next.checked = false;
+    i++;
+  }
+  variableCheckboxHandler();
 }

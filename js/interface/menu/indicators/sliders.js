@@ -63,7 +63,6 @@ export function createIndicatorSliders(indicators) {
 
   // Add the womble indicators buttons
   // document.getElementById('womble-indicators-sliders').classList.remove("hide");
-  document.getElementById("womble-indicators-buttons").classList.remove("hide");
 }
 
 /**

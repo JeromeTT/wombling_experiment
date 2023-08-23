@@ -1,4 +1,4 @@
-import { setIndicatorsData } from "./data.js";
+import { setIndicatorsData } from "./data/globaldata.js";
 import Papa from "https://cdn.skypack.dev/papaparse@5.3.0";
 
 export function changeBG(e) {

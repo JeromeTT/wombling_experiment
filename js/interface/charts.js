@@ -6,7 +6,7 @@ export function histogram({
   data,
   parent,
   scale = 4,
-  flipped = false,
+  flipped = true,
   thresholds = 10,
   reference = (d) => d,
   datapoint = null,
@@ -64,6 +64,19 @@ export function histogram({
     .attr("x", (d) => x(d.x0) + 1)
     .attr("fill", (d) => (d.contains ? "red" : "steelblue"))
     .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
-    .attr("y", (d) => 0)
+    .attr("y", (d) => (flipped ? height - (y(0) - y(d.length)) : 0))
     .attr("height", (d) => y(0) - y(d.length));
+
+  // Full bar hover
+  svg
+    .append("g")
+    .selectAll()
+    .data(bins)
+    .join("rect")
+    .attr("x", (d) => x(d.x0) + 1)
+    .attr("fill-opacity", (d) => (d.contains ? 1 : 0))
+    .attr("fill", (d) => (d.contains ? "pink" : "steelblue"))
+    .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
+    .attr("y", (d) => (flipped ? 0 : y(0) - y(d.length)))
+    .attr("height", (d) => y(d.length));
 }

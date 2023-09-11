@@ -27,11 +27,6 @@ export function addInputListeners(map) {
     },
     { id: "min-slider", handler: minMaxSliderHandler, event: "input" },
     { id: "max-slider", handler: minMaxSliderHandler, event: "input" },
-    {
-      id: "toggle-edge-selection-checkbox",
-      handler: edgeSelectionHandler,
-      event: "click",
-    },
     { id: "select-all-button", handler: selectAllHandler, event: "click" },
     { id: "deselect-all-button", handler: selectNoneHandler, event: "click" },
   ];
@@ -54,7 +49,6 @@ export function runAllInputHandlers(map) {
     transparencySliderHandler,
     minMaxSliderHandler,
     dimensionHandler,
-    edgeSelectionHandler,
   ];
 
   for (let handler of inputHandlers) {
@@ -274,14 +268,6 @@ export class darkModeToggle {
     this._container.parentNode.removeChild(this._container);
     this._map = undefined;
   }
-}
-
-function edgeSelectionHandler(map) {
-  let checked = document.getElementById(
-    "toggle-edge-selection-checkbox"
-  ).checked;
-  GlobalData.edgeSelectionMode = checked;
-  map.setFilter("areas", ["boolean", checked]);
 }
 
 function selectAllHandler(map) {

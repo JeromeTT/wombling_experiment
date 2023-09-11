@@ -21,6 +21,7 @@ import { initLegend as initLegend } from "./interface/map/legend.js";
 import { GlobalData } from "./data/globaldata.js";
 import { changeBG } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
+import { menuInitDropdownBehaviour } from "./interface/menu/sidemenu.js";
 
 // Could also use fetch instead of import
 // fetch("./boundaries_SA1_2016.geojson")
@@ -92,6 +93,7 @@ let map = new mapboxgl.Map({
 });
 
 menuInitCollapsibleBehaviour();
+menuInitDropdownBehaviour();
 initLegend();
 
 map.addControl(new mapboxgl.NavigationControl());
@@ -134,12 +136,6 @@ runWombleButton.addEventListener("click", async () => {
   // Draw walls if in 3d mode, using buffered source (polygon features)
   runWomble(map, GlobalData.selectedUnbuffered, GlobalData.selectedBuffered);
 
-  // Toggle boundary selection mode
-  if (GlobalData.edgeSelectionMode) {
-    map.setFilter("areas", ["boolean", true]);
-  } else {
-    map.setFilter("areas", ["boolean", false]);
-  }
   await showLoader(false);
 });
 

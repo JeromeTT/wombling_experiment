@@ -29,7 +29,10 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <!-- Map goes in here -->
     <div id="map"></div>
-    <div class="map-overlay top">
+    <div id="areaSelectMessage">
+      To select a boundary, click on its two neighbouring areas.
+    </div>
+    <div class="map-overlay map-overlay-left top">
       <button id="menu-collapsible" class="collapsible">Menu</button>
       <div
         id="menu-contents"
@@ -211,23 +214,6 @@
 
         <hr />
 
-        <h5>Dev Tools</h5>
-
-        <label
-          class="checkbox-container"
-          id="toggle-edge-selection-checkbox-div"
-        >
-          Toggle Edge Selection Mode
-          <input
-            type="checkbox"
-            id="toggle-edge-selection-checkbox"
-            checked="checked"
-            name="view"
-          />
-          <span class="checkmark"></span>
-        </label>
-        <hr />
-
         <h5>Base Map</h5>
 
         <div>
@@ -268,6 +254,44 @@
             </div>
           </fieldset>
         </div>
+      </div>
+    </div>
+    <div class="map-overlay map-overlay-right">
+      <div class="map-overlay-inner-right">
+        <div id="menu-right-content" class="menu-right-content">
+          <div class="menu-right-content-title">
+            Wombled Boundary Information:
+          </div>
+          <hr />
+          <div class="menu-right-content-message">
+            Select a boundary to display additional information.
+          </div>
+          <div id="menu-right-wombled-data"></div>
+          <div class="menu-right-dropdown-parent">
+            <div>Change Variable</div>
+            <div id="menu-right-variables"></div>
+            <select
+              id="menu-right-indicatorChange"
+              class="menu-right-dropdown"
+            ></select>
+          </div>
+
+          <div id="menu-right-data" class="menu-right-data">
+            <div><u>Boundary Difference</u></div>
+            <div id="area-difference-text" class="area-difference-text"></div>
+            <div id="area-difference-data" class="area-difference-data"></div>
+            <hr />
+            <div><u>Area 1</u></div>
+            <div id="area1-text" class="area1-text"></div>
+            <div id="area1-data" class="area1-data"></div>
+            <hr />
+            <div><u>Area 2</u></div>
+            <div id="area2-text" class="area2-text"></div>
+            <div id="area2-data" class="area2-data"></div>
+            <hr />
+          </div>
+        </div>
+        <button id="menu-collapsible-right" class="collapsible-right">></button>
       </div>
     </div>
     <div class="loader-panel" id="loader-panel" hidden>

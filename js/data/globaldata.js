@@ -43,9 +43,7 @@ export class GlobalData {
     }
     return values;
   }
-
-  static edgeSelectionMode = true;
-  static selectedArea = { area: null, neighbours: new Set() };
+  static selectedArea = { areas: null, neighbours: new Set() };
 }
 
 /**
@@ -54,10 +52,21 @@ export class GlobalData {
  */
 export async function setIndicatorsData(data) {
   await showLoader(true, "Starting data preprocessing");
+
   GlobalData.indicatorsData = data.data;
   let headers = Object.keys(data.data[0]);
   GlobalData.csvAreaID = headers.shift();
   GlobalData.indicatorsHeaders = headers;
+
+  // Remove nulls
+  GlobalData.indicatorsData = GlobalData.indicatorsData.filter(
+    (row) => row[GlobalData.csvAreaID] != null
+  );
+  for (let row of GlobalData.indicatorsData) {
+    for (let header of GlobalData.indicatorsHeaders) {
+      row[header] = Number(row[header]);
+    }
+  }
 
   // Normalise everything?
   console.log("Indicators Data", GlobalData.indicatorsData);

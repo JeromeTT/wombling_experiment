@@ -1,11 +1,13 @@
 import { retrieveIndicatorSliders } from "./interface/menu/indicators/sliders.js";
-import { Dimensions } from "./util/enums.js";
+import { Dimensions, HELPERTEXT } from "./util/enums.js";
 import { closeExistingPopups } from "./interface/popups.js";
 import { runAllInputHandlers } from "./filter.js";
 import { histogram } from "./interface/charts.js";
 import { GlobalData } from "./data/globaldata.js";
 import { initSource } from "./interface/map/map.js";
 import { showLoader } from "./interface/loader.js";
+import { refreshEntirePanel } from "./interface/menu/sidemenu.js";
+import { showHelperText } from "./interface/helpertext.js";
 
 /**
  * Draws the heights of the edges based on their womble values.
@@ -15,6 +17,7 @@ import { showLoader } from "./interface/loader.js";
  */
 export function runWomble(map, source2D, source3D) {
   GlobalData.selectedVariables = GlobalData.getWombleIndicators();
+  GlobalData.test = source2D.features;
   generateWombleFeaturesData(source2D, source3D);
   initSource(
     map,
@@ -37,6 +40,8 @@ export function runWomble(map, source2D, source3D) {
   document.getElementById("boundaries-checkbox").checked = false;
   runAllInputHandlers(map);
   closeExistingPopups(map);
+  showHelperText(HELPERTEXT.DEFAULT);
+  refreshEntirePanel(map);
 }
 
 /**
@@ -67,6 +72,9 @@ function generateWombleFeaturesData(source2D, source3D) {
     parent: ".dual-slider-overview",
     reference: (d) => d.womble,
   });
+
+  GlobalData.generatedWombleValues = generatedWombleValues;
+
   // Assign the values in place
   for (let i in generatedWombleValues) {
     for (let [key, value] of Object.entries(generatedWombleValues[i])) {
@@ -102,8 +110,14 @@ function calculateWomble(edge, sliders) {
     stat = edge.rank;
   }
   for (let i in selectedIndicators) {
-    featureList[selectedIndicators[i]] = stat[selectedIndicators[i]];
-    featureList.womble += indicatorWeights[i] * stat[selectedIndicators[i]];
+    if (isDistanceWeighted()) {
+      featureList[selectedIndicators[i]] =
+        stat[selectedIndicators[i]] / edge.properties.distance;
+    } else {
+      featureList[selectedIndicators[i]] = stat[selectedIndicators[i]];
+    }
+    featureList.womble +=
+      indicatorWeights[i] * featureList[selectedIndicators[i]];
   }
   return featureList;
 }

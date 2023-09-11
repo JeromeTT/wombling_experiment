@@ -13,10 +13,11 @@ body {
 .map-overlay {
   font: bold 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
   position: absolute;
-  width: 350px;
-  top: 0;
-  left: 0;
   padding: 10px;
+}
+
+.right {
+  margin-left: auto;
 }
 
 .map-overlay .map-overlay-inner {
@@ -184,7 +185,7 @@ input[type="file"] {
 /* DIV SCROLL */
 .map-overlay-inner {
   overflow-y: auto;
-  max-height: 87vh;
+  height: 87vh;
 }
 
 /* LEGEND */
@@ -291,4 +292,87 @@ input[type="file"] {
   font-size: 16px;
   border-radius: 20px;
   font-weight: bold;
+}
+
+.collapsible-right {
+  background-color: yellow;
+  width: 25px;
+}
+
+.map-overlay-right {
+  left: 330px;
+  padding-right: 0px;
+  width: auto;
+}
+
+.map-overlay-inner-right {
+  height: calc(87vh + 56px);
+  display: flex;
+  flex-direction: row;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  background-color: lightblue;
+}
+
+.menu-right-content {
+  padding: 5px;
+  display: none;
+  width: 300px;
+  overflow-y: auto;
+  height: 100%;
+  background: rgb(147, 201, 255);
+  flex: 0 0 auto;
+}
+
+.map-overlay-left {
+  max-width: 350px;
+}
+.menu-right-dropdown {
+  width: 100%;
+}
+
+.menu-right-content-title {
+  font-size: 20px;
+}
+
+.area1-text-child {
+  background: white;
+  padding: 5px;
+}
+
+.area2-text-child {
+  background: white;
+  padding: 5px;
+}
+
+.area1-text-childInnerHistogram {
+  background: rgba(128, 0, 128, 0.5);
+  padding: 5px;
+}
+
+.area2-text-childInnerHistogram {
+  background: rgb(0, 128, 0, 0.5);
+  padding: 5px;
+}
+
+.menu-right-data {
+  border-color: black;
+  border: 2px solid black;
+  padding: 5px;
+}
+
+#areaSelectMessage {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 50px;
+  font-size: 30px;
+}
+
+.form-check {
+  padding: 0.5em 1em 0em 2em;
+}
+
+.form-check-selected {
+  background: #fffec7;
 }

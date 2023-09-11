@@ -12,6 +12,7 @@ export function createVariables(optionsArray) {
   for (let i = 0; i < optionsArray.length; i++) {
     var node = document.createElement("div");
     node.setAttribute("class", "form-check");
+    node.setAttribute("id", "form-check-" + optionsArray[i]);
     node.innerHTML =
       '<label class = "checkbox-container"  for="variable-' +
       i +

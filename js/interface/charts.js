@@ -8,8 +8,9 @@ export function histogram({
   scale = 4,
   flipped = true,
   thresholds = 10,
-  reference = (d) => d,
+  reference = (d) => Number(d),
   datapoint = null,
+  color = "steelblue",
 }) {
   const width = 1000;
   const height = width / scale;
@@ -20,7 +21,6 @@ export function histogram({
       d3.range(thresholds).map((t) => min + (t / thresholds) * (max - min))
     )
     .value(f)(data);
-
   if (datapoint) {
     //Check which bucket it is
     for (let bin of bins) {
@@ -62,7 +62,7 @@ export function histogram({
     .data(bins)
     .join("rect")
     .attr("x", (d) => x(d.x0) + 1)
-    .attr("fill", (d) => (d.contains ? "red" : "steelblue"))
+    .attr("fill", (d) => (d.contains ? "red" : color))
     .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
     .attr("y", (d) => (flipped ? height - (y(0) - y(d.length)) : 0))
     .attr("height", (d) => y(0) - y(d.length));
@@ -75,7 +75,7 @@ export function histogram({
     .join("rect")
     .attr("x", (d) => x(d.x0) + 1)
     .attr("fill-opacity", (d) => (d.contains ? 1 : 0))
-    .attr("fill", (d) => (d.contains ? "pink" : "steelblue"))
+    .attr("fill", (d) => (d.contains ? "pink" : color))
     .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
     .attr("y", (d) => (flipped ? 0 : y(0) - y(d.length)))
     .attr("height", (d) => y(d.length));

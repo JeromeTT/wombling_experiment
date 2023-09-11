@@ -14,7 +14,7 @@ export function getColourExpression() {
   return result;
 }
 
-export function getVariableWidthExpression() {
+export function getVariableWidthExpression(boundaryWidth = 0) {
   // mapbox expression to use interpolation to adjust line width at different zoom levels
   // exponential function is used to create an effect where as you zoom in, the max line width increases while maintaining the min line width
   // lower zoom levels also use a division expression to make the minimum thickness even smaller
@@ -25,37 +25,38 @@ export function getVariableWidthExpression() {
     ["zoom"],
     // line width range is (0.1, 4]
     8,
-    ["/", ["^", 40, ["get", "womble_scaled"]], 10],
+    ["+", ["/", ["^", 40, ["get", "womble_scaled"]], 10], boundaryWidth],
     // line width range is (0.125, 5]
     9,
-    ["/", ["^", 40, ["get", "womble_scaled"]], 8],
+    ["+", ["/", ["^", 40, ["get", "womble_scaled"]], 8], boundaryWidth],
     // line width range is (0.167, 6.67]
     10,
-    ["/", ["^", 40, ["get", "womble_scaled"]], 6],
+    ["+", ["/", ["^", 40, ["get", "womble_scaled"]], 6], boundaryWidth],
     // line width range is (0.25, 10]
     11,
-    ["/", ["^", 40, ["get", "womble_scaled"]], 4],
+    ["+", ["/", ["^", 40, ["get", "womble_scaled"]], 4], boundaryWidth],
     // at zoom lvl 12, the line width range is (1, 11]
     12,
-    ["^", 11, ["get", "womble_scaled"]],
+    ["+", ["^", 11, ["get", "womble_scaled"]], boundaryWidth],
     // at zoom lvl 13, the line width range is (1, 12]
     13,
-    ["^", 12, ["get", "womble_scaled"]],
+    ["+", ["^", 12, ["get", "womble_scaled"]], boundaryWidth],
     // at zoom lvl 14, the line width range is (1, 13]
     14,
-    ["^", 13, ["get", "womble_scaled"]],
+    ["+", ["^", 13, ["get", "womble_scaled"]], boundaryWidth],
     // at zoom lvl 15, the line width range is (1, 14]
     15,
-    ["^", 14, ["get", "womble_scaled"]],
+    ["+", ["^", 14, ["get", "womble_scaled"]], boundaryWidth],
     // at zoom lvl 16+, the line width range is (1, 15]
     16,
-    ["^", 15, ["get", "womble_scaled"]],
+    ["+", ["^", 15, ["get", "womble_scaled"]], boundaryWidth],
   ];
 }
 
 export function getConstantWidthExpression() {
   // used when colour only is selected
   // all lines should have the same width, but this width needs to be adjusted based on zoom level
+
   return [
     "interpolate",
     ["linear"],

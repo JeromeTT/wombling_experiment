@@ -55,14 +55,22 @@ export function initLayer(map, sourceID) {
         paint: {
           "fill-color": [
             "case",
+            ["boolean", ["feature-state", "selectedArea1"], false],
+            "purple",
+            ["boolean", ["feature-state", "selectedArea2"], false],
+            "green",
             ["boolean", ["feature-state", "selected"], false],
-            "red",
+            "purple",
             ["boolean", ["feature-state", "neighbour"], false],
             "lightgreen",
             "blue",
           ],
           "fill-opacity": [
             "case",
+            ["boolean", ["feature-state", "selectedArea1"], false],
+            0.5,
+            ["boolean", ["feature-state", "selectedArea2"], false],
+            0.5,
             ["boolean", ["feature-state", "selected"], false],
             0.2,
             ["boolean", ["feature-state", "neighbour"], false],
@@ -70,7 +78,7 @@ export function initLayer(map, sourceID) {
             0,
           ],
         },
-        filter: ["boolean", false], // initialise filter to show no features by setting false
+        filter: ["boolean", true], // initialise filter to show no features by setting false
       };
       break;
     case "wallsSource2D":

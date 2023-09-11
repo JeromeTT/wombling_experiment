@@ -300,7 +300,8 @@ input[type="file"] {
 }
 
 .map-overlay-right {
-  left: 330px;
+  left: 340px;
+  padding-left: 0px;
   padding-right: 0px;
   width: auto;
 }

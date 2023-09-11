@@ -325,8 +325,9 @@ input[type="file"] {
 }
 
 .map-overlay-left {
-  max-width: 350px;
+  width: 350px;
 }
+
 .menu-right-dropdown {
   width: 100%;
 }

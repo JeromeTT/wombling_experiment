@@ -123,28 +123,30 @@ export function initClickableAreaBehaviour(map) {
 }
 
 export function findBoundary(map, id1, id2) {
-  // let wall = GlobalData.test.find(
-  //   (elem) =>
-  //     (elem["sa1_id1"] == id1 && elem["sa1_id2"] == id2) ||
-  //     (elem["sa1_id1"] == id2 && elem["sa1_id2"] == id1)
-  // );
-  let wall = map.queryRenderedFeatures({
-    layers: ["walls2D"],
-    filter: [
-      "any",
-      [
-        "all",
-        ["==", ["to-string", ["get", "sa1_id1"]], id1],
-        ["==", ["to-string", ["get", "sa1_id2"]], id2],
-      ],
-      [
-        "all",
-        ["==", ["to-string", ["get", "sa1_id1"]], id2],
-        ["==", ["to-string", ["get", "sa1_id2"]], id1],
-      ],
-    ],
-  });
-  wall = wall.length > 0 ? wall[0] : null;
+  console.log(GlobalData.test);
+  let wall = GlobalData.test.find(
+    (elem) =>
+      (elem.properties["sa1_id1"] == id1 &&
+        elem.properties["sa1_id2"] == id2) ||
+      (elem.properties["sa1_id1"] == id2 && elem.properties["sa1_id2"] == id1)
+  );
+  // let wall = map.queryRenderedFeatures({
+  //   layers: ["walls2D"],
+  //   filter: [
+  //     "any",
+  //     [
+  //       "all",
+  //       ["==", ["to-string", ["get", "sa1_id1"]], id1],
+  //       ["==", ["to-string", ["get", "sa1_id2"]], id2],
+  //     ],
+  //     [
+  //       "all",
+  //       ["==", ["to-string", ["get", "sa1_id1"]], id2],
+  //       ["==", ["to-string", ["get", "sa1_id2"]], id1],
+  //     ],
+  //   ],
+  // });
+  // wall = wall.length > 0 ? wall[0] : null;
   console.log("wall", wall);
   return wall;
 }

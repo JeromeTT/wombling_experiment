@@ -18,7 +18,7 @@ import { menuInitCollapsibleBehaviour } from "./interface/menu/menu.js";
 import { addStyleListeners } from "./styleOptions.js";
 
 import { initLegend as initLegend } from "./interface/map/legend.js";
-import { GlobalData } from "./data/globaldata.js";
+import { GlobalData, setIndicatorsData } from "./data/globaldata.js";
 import { changeBG } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
 import { menuInitDropdownBehaviour } from "./interface/menu/sidemenu.js";
@@ -69,7 +69,8 @@ export function areaDropDownHandler(map) {
 
   console.log("UNBUFFERED", GlobalData.selectedUnbuffered);
   console.log("BUFFERED", GlobalData.selectedBuffered);
-
+  // Pre-womble data again:
+  setIndicatorsData();
   // button for drawing the edge heights based on womble calculation
   closeExistingPopups(map);
 }

@@ -50,27 +50,33 @@ export class GlobalData {
  * TODO:
  * @param {*} data
  */
-export async function setIndicatorsData(data) {
-  await showLoader(true, "Starting data preprocessing");
+export async function setIndicatorsData(data = null) {
+  if (data != null) {
+    await showLoader(true, "Starting data preprocessing");
 
-  GlobalData.indicatorsData = data.data;
-  let headers = Object.keys(data.data[0]);
-  GlobalData.csvAreaID = headers.shift();
-  GlobalData.indicatorsHeaders = headers;
+    GlobalData.indicatorsData = data.data;
+    let headers = Object.keys(data.data[0]);
+    GlobalData.csvAreaID = headers.shift();
+    GlobalData.indicatorsHeaders = headers;
+    // Remove nulls
+    GlobalData.indicatorsData = GlobalData.indicatorsData.filter(
+      (row) => row[GlobalData.csvAreaID] != null
+    );
 
-  // Remove nulls
-  GlobalData.indicatorsData = GlobalData.indicatorsData.filter(
-    (row) => row[GlobalData.csvAreaID] != null
-  );
-  for (let row of GlobalData.indicatorsData) {
-    for (let header of GlobalData.indicatorsHeaders) {
-      row[header] = Number(row[header]);
+    // Convert to numbers
+    for (let row of GlobalData.indicatorsData) {
+      for (let header of GlobalData.indicatorsHeaders) {
+        row[header] = Number(row[header]);
+      }
     }
   }
-
+  if (GlobalData.indicatorsData == undefined) {
+    return;
+  }
+  await showLoader(true, "Starting data preprocessing");
+  const headers = GlobalData.indicatorsHeaders;
   // Normalise everything?
   console.log("Indicators Data", GlobalData.indicatorsData);
-  console.log("headers", headers);
   await showLoader(true, "Removing non-indicator boundaries");
   // Remove all boundaries which do not have indicators assigned to them
   removeUndefinedBoundaries(GlobalData.selectedUnbuffered);

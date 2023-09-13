@@ -26,7 +26,7 @@ export function changeBG(e) {
 
   let papaParseCallback = function (results) {
     let headers = Object.keys(results.data[0]);
-    console.log(`papa: ${results}`);
+    console.log("papa", results.data);
     console.log(headers);
     setIndicatorsData(results);
   };

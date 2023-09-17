@@ -1,3 +1,5 @@
+import { getChoroplethColorScale } from "../util/scale.js";
+
 /**
  * Utilised D3.js to draw a histogram
  * @param {*} param0 TODO

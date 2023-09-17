@@ -46,6 +46,10 @@ export class GlobalData {
   static selectedArea = { areas: null, neighbours: new Set() };
 }
 
+export async function setIndicatorsDataFromUpload(d = null) {
+  setIndicatorsData({ data: d });
+}
+
 /**
  * TODO:
  * @param {*} data

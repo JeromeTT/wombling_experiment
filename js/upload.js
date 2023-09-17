@@ -1,5 +1,6 @@
 import { setIndicatorsData } from "./data/globaldata.js";
 import Papa from "https://cdn.skypack.dev/papaparse@5.3.0";
+import { areaDropDownHandler } from "./index.js";
 
 export function changeBG(e) {
   const customTxt = document.getElementById("custom-text");
@@ -57,4 +58,20 @@ function csvToArr(stringVal, splitter) {
   return [formedArr, headers];
 
   // return formedArr;
+}
+
+export function uploadFromURL(map) {
+  const button = document.getElementById("csvAuto");
+  button.addEventListener("click", () => {
+    const dropdown = document.getElementById("areasSelect");
+    const customTxt = document.getElementById("custom-text");
+    dropdown.value = "sa1_2011";
+    areaDropDownHandler(map);
+    const url =
+      "https://raw.githubusercontent.com/JeromeTT/wombling_experiment/main/liveability_sa1_2011.csv";
+    d3.csv(url).then((d) => {
+      setIndicatorsData({ data: d });
+    });
+    customTxt.innerHTML = "liveability_sa1_2011.csv";
+  });
 }

@@ -79,9 +79,24 @@ input[type="file"] {
 .custom-file-upload {
   display: inline-block;
   margin-left: 24px;
-  font-size: 18px;
+  font-size: 12px;
   font-weight: bold;
-  width: 275px;
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  color: #2a68a5;
+  padding: 8px;
+  font-family: Arial;
+  background-color: #cff0f2;
+  border-radius: 25px;
+}
+
+.custom-use-existing-upload {
+  display: inline-block;
+  margin-left: 24px;
+  font-size: 12px;
+  font-weight: bold;
+  width: 100%;
   height: auto;
   cursor: pointer;
   color: #2a68a5;
@@ -189,13 +204,11 @@ input[type="file"] {
 }
 
 /* LEGEND */
-
 #legend {
-  padding: 10px;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
-  line-height: 20px;
-  margin-bottom: 40px;
-  width: 203px;
+  bottom: 100px;
+}
+
+#legend-choropleth {
 }
 
 .map-overlay-legend {
@@ -207,6 +220,10 @@ input[type="file"] {
   font-family: Arial, sans-serif;
   overflow: auto;
   border-radius: 3px;
+  padding: 10px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+  line-height: 20px;
+  margin-bottom: 40px;
 }
 
 .legend-key {

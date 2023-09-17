@@ -44,7 +44,9 @@
   border-width: 1px 1px 1px 1px;
   box-shadow: 3px;
 }
-
+.checkmark-circle {
+  border-radius: 25px;
+}
 /* On mouse-over, add a grey background color */
 .checkbox-container:hover input ~ .checkmark {
   background-color: #ccc;

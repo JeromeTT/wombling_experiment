@@ -40,19 +40,25 @@
         style="overflow-y: auto"
       >
         <!-- <label for="areasSelect">Select an area type:</label> -->
-
-        <select name="areasSelect" id="areasSelect" class="dropdown-large">
-          <option value="sa1_2011">SA1 2011</option>
-          <option value="sa1_2016" selected>SA1 2016</option>
-        </select>
-        <br />
-        <br />
+        <div class="block">
+          <select name="areasSelect" id="areasSelect" class="dropdown-large">
+            <option value="sa1_2011">SA1 2011</option>
+            <option value="sa1_2016" selected>SA1 2016</option>
+          </select>
+        </div>
 
         <div class="block">
           <label for="csvInput" class="custom-file-upload btn">
             Choose a CSV file to upload.
           </label>
-          <br />
+          <input type="file" id="csvInput" accept=".csv" />
+        </div>
+
+        <div class="block">
+          <label for="csvAuto" class="custom-use-existing-upload btn">
+            Use pre-existing SA1 2011 Indicator set.
+          </label>
+          <input type="button" style="display: none" id="csvAuto" />
           <span id="custom-text" class="file-upload-tooltip">
             No file chosen, yet. &#x1F6C8;
             <span class="mytooltiptext"
@@ -60,7 +66,6 @@
               contain variable data.</span
             >
           </span>
-          <input type="file" id="csvInput" accept=".csv" />
         </div>
         <hr />
         <div id="selectionBlock">
@@ -81,37 +86,47 @@
             <div class="womble-indicators-buttons-container">
               <hr />
               <button id="deselect-all-button" class="womble-indicators-button">
-                Deselect All
+                Deselect All Indicators
               </button>
               <button id="select-all-button" class="womble-indicators-button">
-                Select All
+                Select All Indicators
               </button>
-
-              <label class="checkbox-container" for="distance-weight-checkbox"
-                >Distance Weight
-                <input type="checkbox" id="distance-weight-checkbox" />
-                <span class="checkmark"></span>
-              </label>
-
-              <label class="checkbox-container" for="normalize-checkbox"
-                >Normalise
-                <input type="checkbox" id="normalize-checkbox" />
-                <span class="checkmark"></span>
-              </label>
-
-              <label class="checkbox-container" for="rank-checkbox"
-                >Ranked
-                <input type="checkbox" id="rank-checkbox" />
-                <span class="checkmark"></span>
-              </label>
-
-              <br />
               <button
                 id="reset-weights-button"
                 class="womble-indicators-button"
               >
                 Reset Weights
               </button>
+              <label class="checkbox-container" for="distance-weight-checkbox"
+                >Distance Weight
+                <input type="checkbox" id="distance-weight-checkbox" />
+                <span class="checkmark"></span>
+              </label>
+
+              <label class="checkbox-container" for="www-checkbox"
+                >Normal difference boundaries
+                <input
+                  type="radio"
+                  id="www-checkbox"
+                  name="radio1"
+                  checked="checked"
+                />
+                <span class="checkmark checkmark-circle"></span>
+              </label>
+
+              <label class="checkbox-container" for="normalize-checkbox"
+                >Normalise differences
+                <input type="radio" id="normalize-checkbox" name="radio1" />
+                <span class="checkmark checkmark-circle"></span>
+              </label>
+
+              <label class="checkbox-container" for="rank-checkbox"
+                >Rank differences
+                <input type="radio" id="rank-checkbox" name="radio1" />
+                <span class="checkmark checkmark-circle"></span>
+              </label>
+
+              <br />
               <button id="run-womble-button" class="womble-indicators-button">
                 Run
               </button>
@@ -306,6 +321,11 @@
     </div>
 
     <div class="map-overlay-legend" id="legend"></div>
+    <div class="map-overlay-legend" id="legend-choropleth">
+      <div>
+        <span><b>Area Color Scale</b></span>
+      </div>
+    </div>
 
     <script src="js/index.js" type="module"></script>
     <link rel="stylesheet" type="text/css" href="css/checkbox.css" />

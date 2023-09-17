@@ -33,7 +33,6 @@ export function getChoroplethColourExpression(indicator) {
     }
     return acc;
   }, 100000000);
-  console.log(max);
   const n = DEFAULT.SCALESECTIONS;
   const colors = getChoroplethColorScale(n);
   let result = ["interpolate", ["linear"], ["get", indicator]];
@@ -44,6 +43,7 @@ export function getChoroplethColourExpression(indicator) {
   console.log("choropleth color scale", result);
   return result;
 }
+
 export function getVariableWidthExpression(boundaryWidth = 0) {
   // mapbox expression to use interpolation to adjust line width at different zoom levels
   // exponential function is used to create an effect where as you zoom in, the max line width increases while maintaining the min line width

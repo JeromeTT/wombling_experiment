@@ -1,4 +1,3 @@
-import { updateChoropleth } from "./choropleth.js";
 import { createIndicatorSliders } from "./sliders.js";
 
 var firstUpload = true;

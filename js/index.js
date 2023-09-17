@@ -19,7 +19,7 @@ import { addStyleListeners } from "./styleOptions.js";
 
 import { initLegend as initLegend } from "./interface/map/legend.js";
 import { GlobalData, setIndicatorsData } from "./data/globaldata.js";
-import { changeBG } from "./upload.js";
+import { changeBG, uploadFromURL } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
 import { menuInitDropdownBehaviour } from "./interface/menu/sidemenu.js";
 import { choroplethSelectionHandler } from "./interface/menu/indicators/choropleth.js";
@@ -53,20 +53,18 @@ export function areaDropDownHandler(map) {
   let selection = document.getElementById("areasSelect").value;
   GlobalData.selectedUnbuffered = areaTypes[selection].unbuffered;
   GlobalData.selectedBuffered = areaTypes[selection].buffered;
-  let selectedAreas = areaTypes[selection].areas;
   GlobalData.selectedAreas = areaTypes[selection].areas;
   GlobalData.geojsonAreaCode = areaTypes[selection].areaCodeProp;
 
   // Assign area ids
-  for (let feature of selectedAreas.features) {
+  for (let feature of GlobalData.selectedAreas.features) {
     feature.id = feature.properties[GlobalData.geojsonAreaCode];
   }
 
   // Re-init map boundaries
-  console.log(selectedAreas);
-  initSource(map, selectedAreas, "boundariesSource");
+  initSource(map, GlobalData.selectedAreas, "boundariesSource");
   console.log("Map boundaries initialised");
-  initSource(map, selectedAreas, "areasSource");
+  initSource(map, GlobalData.selectedAreas, "areasSource");
   console.log("Map areas initialised");
 
   console.log("UNBUFFERED", GlobalData.selectedUnbuffered);
@@ -75,7 +73,7 @@ export function areaDropDownHandler(map) {
   setIndicatorsData();
   // button for drawing the edge heights based on womble calculation
   closeExistingPopups(map);
-  choroplethSelectionHandler(map, GlobalData.selectedAreas);
+  choroplethSelectionHandler(map);
 }
 
 //// MAIN ////
@@ -120,6 +118,8 @@ map.on("load", () => {
 
   addInputListeners(map);
   addStyleListeners(map);
+
+  uploadFromURL(map);
 });
 
 // Run Womble Button

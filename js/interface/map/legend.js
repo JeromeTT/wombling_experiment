@@ -1,5 +1,9 @@
 import { DEFAULT } from "../../util/enums.js";
-import { getColorScale, getWombleScale } from "../../util/scale.js";
+import {
+  choroplethLegend,
+  getColorScale,
+  getWombleScale,
+} from "../../util/scale.js";
 /**
  * Appends the map legend to the HTML.
  */
@@ -11,7 +15,7 @@ export function initLegend() {
 
   const item = document.createElement("div");
   const value = document.createElement("span");
-  value.innerHTML = "<b>Wombled Scaled Values</b>";
+  value.innerHTML = "<b>Wombled Boundaries Color Scale</b>";
   item.appendChild(value);
   legend.appendChild(item);
 
@@ -31,4 +35,12 @@ export function initLegend() {
     item.appendChild(value);
     legend.appendChild(item);
   }
+  initChroplethLegend();
+}
+
+export function initChroplethLegend() {
+  const legend = document.getElementById("legend-choropleth");
+  choroplethLegend(legend, d3.scaleSequential([0, 5], d3.interpolateBlues), {
+    title: "",
+  });
 }

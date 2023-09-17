@@ -171,6 +171,8 @@ export function refreshDropdownSelections() {
       child.classList.remove("form-check-selected");
     }
   }
+
+  //
 }
 
 export function refreshEntirePanel(map) {

@@ -1,5 +1,10 @@
+import { GlobalData } from "./data/globaldata.js";
 import { DEFAULT } from "./util/enums.js";
-import { getColorScale, getWombleScale } from "./util/scale.js";
+import {
+  getChoroplethColorScale,
+  getColorScale,
+  getWombleScale,
+} from "./util/scale.js";
 
 export function getColourExpression() {
   const n = DEFAULT.SCALESECTIONS;
@@ -11,9 +16,34 @@ export function getColourExpression() {
     result.push(colors(i));
   }
   result.push(colors(0));
+  console.log("result color scale", result);
   return result;
 }
 
+export function getChoroplethColourExpression(indicator) {
+  const max = GlobalData.indicatorsData.reduce((acc, row) => {
+    if (row[indicator] > acc) {
+      acc = row[indicator];
+    }
+    return acc;
+  }, 0);
+  const min = GlobalData.indicatorsData.reduce((acc, row) => {
+    if (row[indicator] < acc) {
+      acc = row[indicator];
+    }
+    return acc;
+  }, 100000000);
+  console.log(max);
+  const n = DEFAULT.SCALESECTIONS;
+  const colors = getChoroplethColorScale(n);
+  let result = ["interpolate", ["linear"], ["get", indicator]];
+  for (let i = 0; i <= n; i++) {
+    result.push(min + (i / n) * (max - min));
+    result.push(colors(i));
+  }
+  console.log("choropleth color scale", result);
+  return result;
+}
 export function getVariableWidthExpression(boundaryWidth = 0) {
   // mapbox expression to use interpolation to adjust line width at different zoom levels
   // exponential function is used to create an effect where as you zoom in, the max line width increases while maintaining the min line width

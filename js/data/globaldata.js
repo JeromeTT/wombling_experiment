@@ -68,11 +68,28 @@ export async function setIndicatorsData(data = null) {
       for (let header of GlobalData.indicatorsHeaders) {
         row[header] = Number(row[header]);
       }
+      row[GlobalData.csvAreaID] = row[GlobalData.csvAreaID].toString();
     }
   }
   if (GlobalData.indicatorsData == undefined) {
     return;
   }
+
+  // This assumes that the data is ordered...
+  // Risky stuff
+  // TODO: FIX
+  // Appends the newly loaded indicator data into the existing area dataset
+  // Used for choropleth
+  removeUndefinedAreas();
+  GlobalData.selectedAreas.features.sort((a, b) => a.id.localeCompare(b.id));
+  GlobalData.indicatorsData.sort((a, b) =>
+    a[GlobalData.csvAreaID].localeCompare(b[GlobalData.csvAreaID])
+  );
+  for (let [i, value] of GlobalData.selectedAreas.features.entries()) {
+    value.properties = { ...value.properties, ...GlobalData.indicatorsData[i] };
+  }
+
+  console.log(GlobalData.selectedAreas);
   await showLoader(true, "Starting data preprocessing");
   const headers = GlobalData.indicatorsHeaders;
   // Normalise everything?
@@ -140,4 +157,18 @@ function removeUndefinedBoundaries(source) {
     );
     return row1 != undefined && row2 != undefined;
   });
+}
+
+function removeUndefinedAreas() {
+  GlobalData.selectedAreas.features = GlobalData.selectedAreas.features.filter(
+    (area) => {
+      const found = GlobalData.indicatorsData.find(
+        (row) =>
+          row[GlobalData.csvAreaID] ==
+          area.properties[GlobalData.geojsonAreaCode]
+      );
+
+      return found != undefined;
+    }
+  );
 }

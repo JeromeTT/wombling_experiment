@@ -1,4 +1,6 @@
+import { GlobalData } from "../../data/globaldata.js";
 import {
+  getChoroplethColourExpression,
   getColourExpression,
   getHeightExpression,
   getVariableWidthExpression,
@@ -9,20 +11,21 @@ import {
  * @param {*} map the map object the source and layer is added to
  * @param {*} sourceData raw feature data
  * @param {*} sourceID the name of the source
+ * @param {*} optionalData optional layer data to work out the layer
  * @returns
  */
-export function initSource(map, sourceData, sourceID) {
+export function initSource(map, sourceData, sourceID, before = null) {
   // If source exists, simply update the data
   if (map.getSource(sourceID)) {
     map.getSource(sourceID).setData(sourceData);
     return;
   }
-  // Otherwise, add the source + layer
   map.addSource(sourceID, {
     type: "geojson",
     data: sourceData,
   });
-  initLayer(map, sourceID);
+  // Otherwise, add the source + layer
+  initLayer(map, sourceID, before);
 }
 
 /**
@@ -30,7 +33,7 @@ export function initSource(map, sourceData, sourceID) {
  * @param {*} map the map object which the layer is added to
  * @param {*} sourceID source to add the layer
  */
-export function initLayer(map, sourceID) {
+export function initLayer(map, sourceID, before = null) {
   // Layer defines how to display the source
   let layer = { source: sourceID };
   switch (sourceID) {
@@ -68,13 +71,13 @@ export function initLayer(map, sourceID) {
           "fill-opacity": [
             "case",
             ["boolean", ["feature-state", "selectedArea1"], false],
-            0.5,
+            1,
             ["boolean", ["feature-state", "selectedArea2"], false],
-            0.5,
+            1,
             ["boolean", ["feature-state", "selected"], false],
-            0.2,
+            0.6,
             ["boolean", ["feature-state", "neighbour"], false],
-            0.2,
+            0.6,
             0,
           ],
         },
@@ -109,7 +112,32 @@ export function initLayer(map, sourceID) {
         },
       };
       break;
+    case "choroplethSource":
+      const indicator = document.getElementById(
+        "choropleth-indicatorChange"
+      ).value;
+      const active = document.getElementById("choropleth-checkbox").checked;
+      console.log("checkbox!!!", active);
+      layer = {
+        ...layer,
+        id: "choropleth",
+        type: "fill",
+        paint: {
+          "fill-color": getChoroplethColourExpression(indicator),
+          "fill-opacity": 0.6,
+        },
+        filter: ["boolean", active],
+      };
+      if (map.getLayer("choropleth")) {
+        map.removeLayer("choropleth");
+      }
+      break;
   }
   console.log("Adding layer", sourceID, layer);
-  map.addLayer(layer);
+
+  if (before == null) {
+    map.addLayer(layer);
+  } else {
+    map.addLayer(layer, before);
+  }
 }

@@ -4,8 +4,12 @@
  * @param {string[]} color the color palette. Default: ["yellow", "red"]
  * @returns returns a color scale
  */
-export function getColorScale(n = 5, color = ["#FFF8C4", "#B74202"]) {
+export function getColorScale(n = 5) {
   return (x) => d3.interpolateOranges(x / n);
+}
+
+export function getChoroplethColorScale(n = 5) {
+  return (x) => d3.interpolateBlues(x / n);
 }
 
 /**

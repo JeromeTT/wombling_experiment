@@ -8,6 +8,7 @@ import { initSource } from "./interface/map/map.js";
 import { showLoader } from "./interface/loader.js";
 import { refreshEntirePanel } from "./interface/menu/sidemenu.js";
 import { showHelperText } from "./interface/helpertext.js";
+import { updateChoropleth } from "./interface/menu/indicators/choropleth.js";
 
 /**
  * Draws the heights of the edges based on their womble values.

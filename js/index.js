@@ -22,6 +22,7 @@ import { GlobalData, setIndicatorsData } from "./data/globaldata.js";
 import { changeBG } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
 import { menuInitDropdownBehaviour } from "./interface/menu/sidemenu.js";
+import { choroplethSelectionHandler } from "./interface/menu/indicators/choropleth.js";
 
 // Could also use fetch instead of import
 // fetch("./boundaries_SA1_2016.geojson")
@@ -53,6 +54,7 @@ export function areaDropDownHandler(map) {
   GlobalData.selectedUnbuffered = areaTypes[selection].unbuffered;
   GlobalData.selectedBuffered = areaTypes[selection].buffered;
   let selectedAreas = areaTypes[selection].areas;
+  GlobalData.selectedAreas = areaTypes[selection].areas;
   GlobalData.geojsonAreaCode = areaTypes[selection].areaCodeProp;
 
   // Assign area ids
@@ -73,6 +75,7 @@ export function areaDropDownHandler(map) {
   setIndicatorsData();
   // button for drawing the edge heights based on womble calculation
   closeExistingPopups(map);
+  choroplethSelectionHandler(map, GlobalData.selectedAreas);
 }
 
 //// MAIN ////
@@ -99,14 +102,6 @@ initLegend();
 
 map.addControl(new mapboxgl.NavigationControl());
 map.addControl(new DimensionToggle({ pitch: 45 }));
-// map.addControl(new darkModeToggle());
-
-// let selectionSubmit = document.getElementById("submitOptions");
-// selectionSubmit.addEventListener("click", () => submitOptions());
-// function submitOptions() {
-//   let selectedValues = getSelectValues(optionsData);
-//   createIndicatorSliders(selectedValues);
-// }
 
 // Add event listener to the button for resetting indicator weight sliders
 let resetWeightsButton = document.getElementById("reset-weights-button");
@@ -139,6 +134,8 @@ runWombleButton.addEventListener("click", async () => {
 
   await showLoader(false);
 });
+
+// Choropleth selectors
 
 // Default config
 document.getElementById("boundaries-checkbox").checked = true;

@@ -75,6 +75,7 @@
           <h6>Select Womble Indicators:</h6>
 
           <div class="womble-options" id="options"></div>
+
           <!-- This div contains the reset and run buttons for the indicator sliders. Initially hidden until the user selects their indicators -->
           <div id="womble-indicators-buttons" class="hide">
             <div class="womble-indicators-buttons-container">
@@ -116,13 +117,18 @@
               </button>
             </div>
           </div>
-          <!-- <br>
-                <button id="submitOptions">Confirm selection</button> -->
         </div>
         <hr />
 
         <h5>View Options</h5>
-
+        <div id="choropleth-indicators">
+          Choropleth map (single variable):
+          <label class="checkbox-container" for="choropleth-checkbox"
+            ><select id="choropleth-indicatorChange"></select>
+            <input type="checkbox" id="choropleth-checkbox" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
         <label
           >Wall Opacity: <span id="transparency-slider-value">100%</span></label
         >

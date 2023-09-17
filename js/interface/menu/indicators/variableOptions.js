@@ -1,3 +1,4 @@
+import { updateChoropleth } from "./choropleth.js";
 import { createIndicatorSliders } from "./sliders.js";
 
 var firstUpload = true;
@@ -9,6 +10,7 @@ export function createVariables(optionsArray) {
       divID.removeChild(divID.lastChild);
     }
   }
+  // Append checkboxes to indicators list
   for (let i = 0; i < optionsArray.length; i++) {
     var node = document.createElement("div");
     node.setAttribute("class", "form-check");
@@ -31,6 +33,16 @@ export function createVariables(optionsArray) {
     // add event listener to each checkbox
     let checkbox = document.getElementById(`variable-${i}`);
     checkbox.addEventListener("click", variableCheckboxHandler);
+  }
+
+  // Append to choropleth dropdown
+  let select = document.getElementById("choropleth-indicatorChange");
+  select.innerHTML = "";
+  for (let variable of optionsArray) {
+    let option = document.createElement("option");
+    option.setAttribute("value", variable);
+    option.text = variable;
+    select.appendChild(option);
   }
   firstUpload = false;
   document.getElementById("womble-indicators-buttons").classList.remove("hide");

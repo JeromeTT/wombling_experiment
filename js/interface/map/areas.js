@@ -52,23 +52,8 @@ export function initClickableAreaBehaviour(map) {
       let id1 = GlobalData.selectedArea.areas;
       let id2 = areaCode;
       let wall = findBoundary(map, id1, id2);
-
-      map.setFeatureState(
-        { source: "areasSource", id: id1 },
-        { selectedArea1: true }
-      );
-      map.setFeatureState(
-        { source: "areasSource", id: id2 },
-        { selectedArea2: true }
-      );
-      updatePopupMenuArea2(area);
-      updatePopupMenuBoundary(wall);
       wallClicked(map, wall);
       hideHelperText();
-      GlobalData.selectedArea = {
-        areas: [id1, id2],
-        neighbours: new Set(),
-      };
     } else if (GlobalData.selectedArea.areas == areaCode) {
       // Clear GlobalData
       // If it is the same area, therefore, clear everything

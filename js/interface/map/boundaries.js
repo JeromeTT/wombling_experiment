@@ -1,16 +1,9 @@
 import { GlobalData } from "../../data/globaldata.js";
 import { initLayer } from "./map.js";
-import { histogram } from "../charts.js";
 import { rightMenuToggle } from "../menu/menu.js";
 import { Dimensions } from "../../util/enums.js";
-import {
-  updatePopupMenuArea1,
-  updatePopupMenuWomble,
-} from "../menu/sidemenu.js";
-import {
-  getColourExpression,
-  getVariableWidthExpression,
-} from "../../expressions.js";
+import { refreshEntirePanel } from "../menu/sidemenu.js";
+import { getVariableWidthExpression } from "../../expressions.js";
 export function addBoundariesLayer(map) {
   initLayer(map, "boundariesSource");
 }
@@ -24,9 +17,10 @@ export function addAreasLayer(map) {
  * @param {*} map mapbox map
  */
 export function initClickableWallBehaviour(map) {
-  map.on("click", ["walls3D", "walls2D"], (e) => {
+  map.on("click", ["walls3D"], (e) => {
     let wall = e.features[0];
     console.log(e.features[0].geometry);
+    map.removeFeatureState({ source: "areasSource" });
     wallClicked(map, wall);
   });
 
@@ -40,28 +34,30 @@ export function initClickableWallBehaviour(map) {
 }
 
 export function wallClicked(map, wall) {
+  // If in 3D mode,
   let areaIds = [
     wall.properties.sa1_id1.toString(),
     wall.properties.sa1_id2.toString(),
   ];
-  updatePopupMenuWomble(wall);
-  // If in 3D mode,
-  if (GlobalData.appDimension == Dimensions.THREE_D) {
-    map.setFeatureState(
-      { source: "areasSource", id: areaIds[0] },
-      { selectedArea1: true }
-    );
-    updatePopupMenuArea1(areaIds[0]);
-    map.setFeatureState(
-      { source: "areasSource", id: areaIds[1] },
-      { selectedArea2: true }
-    );
-    updatePopupMenuArea1(areaIds[1]);
-  }
+  GlobalData.selectedArea = {
+    areas: areaIds,
+    neighbours: new Set(),
+  };
+  refreshEntirePanel(map);
+  map.setFeatureState(
+    { source: "areasSource", id: areaIds[0] },
+    { selectedArea1: true }
+  );
+  map.setFeatureState(
+    { source: "areasSource", id: areaIds[1] },
+    { selectedArea2: true }
+  );
 
   // If in 2D mode, highlight the boundary
   if (GlobalData.appDimension == Dimensions.TWO_D) {
     drawBoundaryOutline(map, wall);
+  } else if (GlobalData.appDimension == Dimensions.THREE_D) {
+    removeBoundaryOutline(map);
   }
   rightMenuToggle(true);
 }

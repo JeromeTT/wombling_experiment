@@ -8,6 +8,8 @@ import { initSource } from "./interface/map/map.js";
 import { showLoader } from "./interface/loader.js";
 import { refreshEntirePanel } from "./interface/menu/sidemenu.js";
 import { showHelperText } from "./interface/helpertext.js";
+import { wallClicked } from "./interface/map/boundaries.js";
+import { findBoundary } from "./interface/map/areas.js";
 
 /**
  * Draws the heights of the edges based on their womble values.
@@ -154,11 +156,32 @@ export class DimensionToggle {
     }
 
     // switch dimensions when this button is clicked
+
     this._btn.addEventListener("click", () => {
+      map.removeFeatureState({ source: "areasSource" });
+      // Clear all existing
       if (GlobalData.appDimension == Dimensions.TWO_D) {
         this.#switchTo3d(map);
       } else if (GlobalData.appDimension == Dimensions.THREE_D) {
         this.#switchTo2d(map);
+      }
+      console.log("dims", GlobalData.appDimension);
+      if (Array.isArray(GlobalData.selectedArea.areas)) {
+        console.log("CLICKEDDDD");
+        wallClicked(
+          map,
+          findBoundary(
+            map,
+            GlobalData.selectedArea.areas[0],
+            GlobalData.selectedArea.areas[1]
+          )
+        );
+      } else {
+        GlobalData.selectedArea = {
+          areas: null,
+          neighbours: new Set(),
+        };
+        refreshEntirePanel(map);
       }
     });
 
@@ -190,7 +213,7 @@ export class DimensionToggle {
     map.setLayoutProperty("walls2D", "visibility", "none");
     map.setLayoutProperty("walls3D", "visibility", "visible");
     // Change the radio label to height only
-    document.getElementById("height-check-label").innerText =
+    document.getElementById("height-checkbox-div").textContent =
       "Show Wall Height";
   }
 
@@ -210,6 +233,7 @@ export class DimensionToggle {
     map.setLayoutProperty("walls3D", "visibility", "none");
     map.setLayoutProperty("walls2D", "visibility", "visible");
     // Change the radio label to width only
-    document.getElementById("height-check-label").innerText = "Show Wall Width";
+    document.getElementById("height-checkbox-div").textContent =
+      "Show Wall Width";
   }
 }

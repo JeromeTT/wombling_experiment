@@ -118,6 +118,7 @@ export function updatePopupMenuWomble(wall) {
     datapoint: wall.properties,
   });
 }
+
 /**
  * Updates the dropdown selection
  */
@@ -171,8 +172,6 @@ export function refreshDropdownSelections() {
       child.classList.remove("form-check-selected");
     }
   }
-
-  //
 }
 
 export function refreshEntirePanel(map) {

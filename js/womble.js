@@ -213,7 +213,7 @@ export class DimensionToggle {
     map.setLayoutProperty("walls2D", "visibility", "none");
     map.setLayoutProperty("walls3D", "visibility", "visible");
     // Change the radio label to height only
-    document.getElementById("height-checkbox-div").textContent =
+    document.getElementById("height-checkbox-div").childNodes[0].textContent =
       "Show Wall Height";
   }
 
@@ -233,7 +233,7 @@ export class DimensionToggle {
     map.setLayoutProperty("walls3D", "visibility", "none");
     map.setLayoutProperty("walls2D", "visibility", "visible");
     // Change the radio label to width only
-    document.getElementById("height-checkbox-div").textContent =
+    document.getElementById("height-checkbox-div").childNodes[0].textContent =
       "Show Wall Width";
   }
 }

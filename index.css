@@ -262,6 +262,33 @@ input[type="file"] {
   margin-left: -120px; /* Use half of the width, to center the tooltip */
 }
 
+#dynamicTooltip {
+  font-size: 12px;
+  padding: 5px 10px 5px 10px;
+  position: absolute;
+  background-color: rgb(255, 255, 255);
+  border: 2px dotted black;
+  color: rgb(0, 0, 0);
+  text-align: left;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.hoverValue-table {
+  border: 1px solid black;
+}
+.hoverValue-table td {
+  padding-right: 5px;
+  border: 1px solid black;
+}
+.hoverValue-table th {
+  border: 1px solid black;
+}
+.hoverable:hover #dynamicTooltip {
+  opacity: 1;
+}
 /* Show the tooltip text when you mouse over the tooltip container */
 .indicator-options-tooltip:hover .mytooltiptext {
   visibility: visible;
@@ -354,6 +381,31 @@ input[type="file"] {
   font-size: 20px;
 }
 
+.boundary-text-childOuterHistogram {
+  background-color: white;
+  padding: 5px;
+}
+.boundary-text-childInnerHistogram {
+  border: 1px solid grey;
+}
+.boundary-table {
+  text-align: center;
+  width: 100%;
+}
+.value-table {
+  width: 100%;
+}
+
+.value-table td:nth-child(2) {
+  text-align: right;
+}
+.area1-text {
+  padding: 0px 5px 0px 5px;
+}
+
+.area2-text {
+  padding: 0px 5px 0px 5px;
+}
 .area1-text-child {
   background: white;
   padding: 5px;

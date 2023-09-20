@@ -32,6 +32,7 @@
     <div id="areaSelectMessage">
       To select a boundary, click on its two neighbouring areas.
     </div>
+    <div id="dynamicTooltip"></div>
     <div class="map-overlay map-overlay-left top">
       <button id="menu-collapsible" class="collapsible">Menu</button>
       <div
@@ -115,20 +116,20 @@
               </label>
 
               <label class="checkbox-container" for="normalize-checkbox"
-                >Normalise differences
+                >Normalise differences &#x1F6C8
                 <input type="radio" id="normalize-checkbox" name="radio1" />
                 <span class="checkmark checkmark-circle"></span>
               </label>
 
               <label class="checkbox-container" for="rank-checkbox"
-                >Rank differences
+                >Rank differences &#x1F6C8
                 <input type="radio" id="rank-checkbox" name="radio1" />
                 <span class="checkmark checkmark-circle"></span>
               </label>
 
               <br />
               <button id="run-womble-button" class="womble-indicators-button">
-                Run
+                Run Womble
               </button>
             </div>
           </div>
@@ -285,8 +286,9 @@
           </div>
           <hr />
           <div class="menu-right-content-message">
-            Select a boundary to display additional information.
+            Select a boundary to display additional boundary information.
           </div>
+          <hr />
           <div id="menu-right-wombled-data"></div>
           <div class="menu-right-dropdown-parent">
             <div>Change Variable</div>

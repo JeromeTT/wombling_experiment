@@ -120,6 +120,7 @@ map.on("load", () => {
   addStyleListeners(map);
 
   uploadFromURL(map);
+  console.log(d3.interpolateRdYlGn(2));
 });
 
 // Run Womble Button

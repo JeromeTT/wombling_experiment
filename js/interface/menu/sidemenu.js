@@ -34,7 +34,13 @@ function updatePopupMenuArea(
     (elem) => elem[GlobalData.csvAreaID] == areaCode
   );
   let areaTextDiv = document.getElementById(textDivName);
-  areaTextDiv.setHTML(`ID: ${areaCode}`);
+  areaTextDiv.setHTML(`
+  <table class="value-table">
+    <tr>
+      <td> ID (${GlobalData.csvAreaID}):</th>
+      <td> ${areaCode} </th>
+    </tr>
+  </table>`);
 
   let areaDiv = document.getElementById(dataDivName);
   areaDiv.innerHTML = ""; // Clear existing stuff
@@ -49,7 +55,13 @@ function updatePopupMenuArea(
       "class",
       `${textDivName}-childInnerHistogram`
     );
-    childInnerText.setHTML(`Raw value: ${feature[variable].toFixed(2)}`);
+    childInnerText.setHTML(`
+    <table class="value-table">
+      <tr>
+        <td> Raw value:</th>
+        <td> ${feature[variable].toFixed(2)} </th>
+      </tr>
+    </table>`);
     histogram({
       data: GlobalData.indicatorsData,
       parent: childInnerHistogram,
@@ -68,7 +80,6 @@ export function updatePopupMenuBoundary(wall) {
   const weights = retrieveIndicatorSliders();
   let id1 = wall.properties.sa1_id1.toString();
   let id2 = wall.properties.sa1_id2.toString();
-
   const areaDiv = document.getElementById("area-difference-data");
   for (let i in GlobalData.selectedVariables) {
     const variable = GlobalData.selectedVariables[i];
@@ -81,21 +92,42 @@ export function updatePopupMenuBoundary(wall) {
     // Set title
     const child = areaDiv.appendChild(document.createElement("div"));
     child.setAttribute("id", id1 + id2 + variable);
-    const histogramtitle = child.appendChild(document.createElement("div"));
+    const histogramtext = child.appendChild(document.createElement("div"));
     const histogramChild = child.appendChild(document.createElement("div"));
-    histogramtitle.setHTML(
-      `Actual contribution | Expected Contribution: <br> ${differenceContribution.toFixed(
-        2
-      )}% | ${weight.toFixed(2)}% <br> Raw difference: ${difference.toFixed(
-        2
-      )}  <br> Weighted Difference: ${differenceWeighted.toFixed(
-        2
-      )} (${weight.toFixed(2)}%)<br>`
+    histogramChild.setAttribute("class", "boundary-text-childOuterHistogram");
+    histogramtext.setHTML(
+      `<table class="boundary-table">
+          <tr>
+            <th style="width:50%"> Actual contribution</th>
+            <th>Wombled contribution</th>
+          </tr>
+          <tr>
+            <td>${differenceContribution.toFixed(2)}%</td>
+            <td>${weight.toFixed(2)}%</td>
+          </tr>
+       </table>`
     );
-
+    histogramChild.setHTML(`
+    <table class="value-table">
+      <tr>
+        <td> Raw absolute difference:</th>
+        <td> ${difference.toFixed(2)}</th>
+      </tr>
+      <tr>
+        <td> Weighted absolute difference: (weighted ${weight.toFixed(2)}%)</th>
+        <td> ${differenceWeighted.toFixed(2)}</th>
+    </tr>
+    </table>`);
+    const actualHistogramChild = histogramChild.appendChild(
+      document.createElement("div")
+    );
+    actualHistogramChild.setAttribute(
+      "class",
+      "boundary-text-childInnerHistogram"
+    );
     histogram({
       data: GlobalData.selectedBuffered.features,
-      parent: histogramChild,
+      parent: actualHistogramChild,
       reference: (d) => Number(d.properties[variable]),
       datapoint: wall,
     });
@@ -106,10 +138,99 @@ export function updatePopupMenuBoundary(wall) {
 export function updatePopupMenuWomble(wall) {
   let rawWomble = wall.properties.womble.toFixed(3);
   let scaledWomble = wall.properties.womble_scaled.toFixed(3);
-  let description = `Raw womble: ${rawWomble} <br> Scaled womble: ${scaledWomble} <br> Neighbouring area IDs: <br> ID1: ${wall.properties.sa1_id1}, <br> ID2: ${wall.properties.sa1_id2} <div class="popup-charts"></div>`;
+  let maxWomble = (
+    wall.properties.womble / wall.properties.womble_scaled
+  ).toFixed(3);
+  let description = `
+  <table class="value-table">
+    <tr>
+      <td id="label-rawWomble"> Raw womble &#x1F6C8:</th>
+      <td id="value-rawWomble"> &#x1F6C8 ${rawWomble}</th>
+    </tr>
+    <tr>
+      <td id="label-scaledWomble"> Scaled womble &#x1F6C8: </td>
+      <td id="value-scaledWomble"> &#x1F6C8 ${scaledWomble}</td>
+    </tr>
+    <tr>
+      <td> Neighbouring Area ID1 (${GlobalData.csvAreaID}): </td>
+      <td>${wall.properties.sa1_id1}</td>
+    </tr>
+    <tr>
+      <td> Neighbouring Area ID2 (${GlobalData.csvAreaID}):</td>
+      <td>${wall.properties.sa1_id2}</td>
+    </tr>
+  </table>
+  <div class="popup-charts"></div>`;
 
   let parent = document.getElementById("menu-right-wombled-data");
   parent.setHTML(description);
+  eventHover(
+    "label-scaledWomble",
+    "The scaled womble value is obtained from scaling the range of raw wombles to the values 0 and 1."
+  );
+  eventHover(
+    "value-scaledWomble",
+    `Obtained from:<br> ${rawWomble} / ${maxWomble} = ${scaledWomble}`
+  );
+
+  eventHover(
+    "label-rawWomble",
+    "The raw womble value is the sum of the Weighted absolute differences of all the indicators."
+  );
+
+  let list = `<tr>
+      <th> Weight%</th>
+      <th> Indicator</th>
+      <th> Value</th>
+      <th> Contribution%</th>
+    </tr>`;
+  let total = 0;
+  const weights = retrieveIndicatorSliders();
+  for (let i in GlobalData.selectedVariables) {
+    const variable = GlobalData.selectedVariables[i];
+    const weight = parseFloat(weights[i].value);
+    const difference = wall.properties[variable];
+    const differenceWeighted = (difference * weight) / 100;
+    const differenceContribution =
+      (differenceWeighted / wall.properties.womble) * 100;
+    let color = "";
+    if (differenceContribution > weight) {
+      color = d3.interpolateGreens;
+    } else if (differenceContribution < weight) {
+      color = d3.interpolateReds;
+    } else {
+      color = (x) => "white";
+    }
+    let val = Math.abs(differenceContribution - weight) / weight;
+    let textColor = val > 0.5 ? "white" : "black";
+    total += differenceWeighted;
+    list = list.concat(`    
+    <tr>
+      <td> ${weight.toFixed(2)}%</th>
+      <td> ${variable}</td>
+      
+      <td> ${differenceWeighted.toFixed(3)} <- ${weight.toFixed(
+      2
+    )}% * ${difference.toFixed(3)}</th>
+      <td style="background-color: ${color(
+        val
+      )}; color: ${textColor}"> ${differenceContribution.toFixed(2)}%</th>
+    </tr>`);
+  }
+
+  list = list.concat(`<tr>
+    <td colspan="2">Total:</th>
+    <td> ${total.toFixed(3)}</th>
+    <td>100.00%</th>
+  </tr>`);
+  eventHover(
+    "value-rawWomble",
+    `Obtained from:<br>
+    <table class="hoverValue-table">
+    ${list}
+  </table>`
+  );
+
   let child = parent.appendChild(document.createElement("div"));
   histogram({
     data: GlobalData.generatedWombleValues,
@@ -191,4 +312,41 @@ export function refreshEntirePanel(map) {
   } else {
     updatePopupMenuArea1(GlobalData.selectedArea.areas);
   }
+}
+
+function eventHover(id, text) {
+  document.getElementById(id).addEventListener("mouseenter", (e) => {
+    document.getElementById("dynamicTooltip").style.opacity = 1;
+  });
+
+  document.getElementById(id).addEventListener("mousemove", (e) => {
+    testHover(e, text);
+  });
+
+  document.getElementById(id).addEventListener("mouseleave", (e) => {
+    document.getElementById("dynamicTooltip").style.opacity = 0;
+    document.getElementById("dynamicTooltip").style.left = "-10px";
+    document.getElementById("dynamicTooltip").style.top = "-10px";
+    document.getElementById("dynamicTooltip").setHTML("");
+  });
+
+  document
+    .getElementById("dynamicTooltip")
+    .addEventListener("mouseenter", (e) => {
+      document.getElementById("dynamicTooltip").style.opacity = 1;
+    });
+
+  document
+    .getElementById("dynamicTooltip")
+    .addEventListener("mouseleave", (e) => {
+      document.getElementById("dynamicTooltip").style.opacity = 0;
+    });
+}
+
+function testHover(e, text) {
+  var x = e.clientX + 5;
+  var y = e.clientY + 5;
+  document.getElementById("dynamicTooltip").style.left = x + "px";
+  document.getElementById("dynamicTooltip").style.top = y + "px";
+  document.getElementById("dynamicTooltip").setHTML(text);
 }

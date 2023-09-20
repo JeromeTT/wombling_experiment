@@ -21,7 +21,10 @@ import { initLegend as initLegend } from "./interface/map/legend.js";
 import { GlobalData, setIndicatorsData } from "./data/globaldata.js";
 import { changeBG, uploadFromURL } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
-import { menuInitDropdownBehaviour } from "./interface/menu/sidemenu.js";
+import {
+  eventHover,
+  menuInitDropdownBehaviour,
+} from "./interface/menu/sidemenu.js";
 import { choroplethSelectionHandler } from "./interface/menu/indicators/choropleth.js";
 
 // Could also use fetch instead of import
@@ -121,6 +124,19 @@ map.on("load", () => {
 
   uploadFromURL(map);
   console.log(d3.interpolateRdYlGn(2));
+
+  eventHover(
+    "normalize-container",
+    "Normalises the boundary differences using an exponential distribution. <br> Attempts to provide a more uniform distribution while retaining significant values."
+  );
+  eventHover(
+    "distance-container",
+    "Applies an additional distance weight to all the difference boundaries.<br> Distances are calculated from the centroids of each area."
+  );
+  eventHover(
+    "rank-container",
+    "Ranks the boundary differences instead of calculating womble as percentage of maximum. <br> Generally provides a uniform distribution of wombled values."
+  );
 });
 
 // Run Womble Button

@@ -314,7 +314,7 @@ export function refreshEntirePanel(map) {
   }
 }
 
-function eventHover(id, text) {
+export function eventHover(id, text) {
   document.getElementById(id).addEventListener("mouseenter", (e) => {
     document.getElementById("dynamicTooltip").style.opacity = 1;
   });

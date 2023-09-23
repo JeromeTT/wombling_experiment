@@ -19,7 +19,7 @@ import { addStyleListeners } from "./styleOptions.js";
 
 import { initLegend as initLegend } from "./interface/map/legend.js";
 import { GlobalData, setIndicatorsData } from "./data/globaldata.js";
-import { changeBG, uploadFromURL } from "./upload.js";
+import { changeBG, uploadFromURL2011, uploadFromURL2016 } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
 import {
   eventHover,
@@ -122,7 +122,8 @@ map.on("load", () => {
   addInputListeners(map);
   addStyleListeners(map);
 
-  uploadFromURL(map);
+  uploadFromURL2011(map);
+  uploadFromURL2016(map);
   console.log(d3.interpolateRdYlGn(2));
 
   eventHover(

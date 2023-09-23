@@ -141,3 +141,24 @@ export function initLayer(map, sourceID, before = null) {
     map.addLayer(layer, before);
   }
 }
+
+export function removeSourceLayer(map, sourceID) {
+  let layerID = "";
+  switch (sourceID) {
+    case "wallsSource2D":
+      layerID = "walls2D";
+      break;
+    case "wallsSource3D":
+      layerID = "walls3D";
+      break;
+    case "choroplethSource":
+      layerID = "choropleth";
+      break;
+  }
+  if (map.getLayer(layerID)) {
+    map.removeLayer(layerID);
+  }
+  if (map.getSource(sourceID)) {
+    map.removeSource(sourceID);
+  }
+}

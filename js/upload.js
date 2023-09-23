@@ -4,11 +4,8 @@ import { areaDropDownHandler } from "./index.js";
 import { updateChoropleth } from "./interface/menu/indicators/choropleth.js";
 import { removeSourceLayer } from "./interface/map/map.js";
 import { removeBoundaryOutline } from "./interface/map/boundaries.js";
-import {
-  clearPopupMenuArea,
-  refreshDropdownSelections,
-  refreshEntirePanel,
-} from "./interface/menu/sidemenu.js";
+import { clearPopupMenuArea } from "./interface/menu/sidemenu.js";
+import { variableCheckboxHandler } from "./interface/menu/indicators/variableOptions.js";
 
 export function changeBG(e) {
   const customTxt = document.getElementById("custom-text");
@@ -96,6 +93,14 @@ export function uploadFromURL2011(map) {
       document.getElementById("choropleth-indicatorChange").value =
         "urban_liveability_index";
       updateChoropleth(map);
+
+      let optionsDiv = document.getElementById("options");
+      for (let i = 1; i <= 15; i++) {
+        let checkbox =
+          optionsDiv.children[i].children[0].querySelector("input");
+        checkbox.checked = true;
+      }
+      variableCheckboxHandler();
     });
     customTxt.innerHTML = "liveability_sa1_2011.csv";
   });
@@ -125,6 +130,14 @@ export function uploadFromURL2016(map) {
       document.getElementById("choropleth-indicatorChange").value =
         "urban_liveability_index";
       updateChoropleth(map);
+
+      let optionsDiv = document.getElementById("options");
+      for (let i = 1; i <= 7; i++) {
+        let checkbox =
+          optionsDiv.children[i].children[0].querySelector("input");
+        checkbox.checked = true;
+      }
+      variableCheckboxHandler();
     });
     customTxt.innerHTML = "liveability_sa1_2016.csv";
     updateChoropleth(map);

@@ -73,8 +73,10 @@ export function uploadFromURL2011(map) {
   button.addEventListener("click", () => {
     const dropdown = document.getElementById("areasSelect");
     const customTxt = document.getElementById("custom-text");
+    //////////////////
     GlobalData.indicatorsData = undefined;
     removeSourceLayer(map, "choroplethSource");
+
     removeSourceLayer(map, "wallsSource2D");
     removeSourceLayer(map, "wallsSource3D");
     GlobalData.selectedArea = {
@@ -82,13 +84,17 @@ export function uploadFromURL2011(map) {
       neighbours: new Set(),
     };
     clearPopupMenuArea();
+
     removeBoundaryOutline(map);
     dropdown.value = "sa1_2011";
+    //////////////////
     areaDropDownHandler(map);
     const url =
       "https://raw.githubusercontent.com/JeromeTT/wombling_experiment/main/liveability_sa1_2011.csv";
     d3.csv(url).then(async (d) => {
       await setIndicatorsData({ data: d });
+      document.getElementById("choropleth-indicatorChange").value =
+        "urban_liveability_index";
       updateChoropleth(map);
     });
     customTxt.innerHTML = "liveability_sa1_2011.csv";
@@ -116,6 +122,8 @@ export function uploadFromURL2016(map) {
       "https://raw.githubusercontent.com/JeromeTT/wombling_experiment/main/liveability_sa1_2016.csv";
     d3.csv(url).then(async (d) => {
       await setIndicatorsData({ data: d });
+      document.getElementById("choropleth-indicatorChange").value =
+        "urban_liveability_index";
       updateChoropleth(map);
     });
     customTxt.innerHTML = "liveability_sa1_2016.csv";

@@ -40,7 +40,7 @@ export function initLegend() {
 
 export function initChroplethLegend() {
   const legend = document.getElementById("legend-choropleth");
-  choroplethLegend(legend, d3.scaleSequential([0, 5], d3.interpolateBlues), {
+  choroplethLegend(legend, d3.scaleSequential([0, 1], d3.interpolateBlues), {
     title: "",
   });
 }

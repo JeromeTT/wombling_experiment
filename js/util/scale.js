@@ -31,13 +31,13 @@ export function choroplethLegend(
   {
     title,
     tickSize = 6,
-    width = 400,
+    width = 300,
     height = 44 + tickSize,
     marginTop = 18,
     marginRight = 16,
     marginBottom = 16 + tickSize,
     marginLeft = 16,
-    ticks = width / 64,
+    ticks = 1,
     tickFormat,
     tickValues,
   } = {}
@@ -61,7 +61,8 @@ export function choroplethLegend(
     .attr("height", height)
     .attr("viewBox", [0, 0, width, height])
     .style("overflow", "visible")
-    .style("display", "block");
+    .style("display", "block")
+    .style("max-width", "100%");
   let x;
 
   // Continuous

@@ -215,6 +215,7 @@ input[type="file"] {
   position: absolute;
   bottom: 0;
   right: 0;
+  width: 300px;
   background: #fff;
   margin-right: 20px;
   font-family: Arial, sans-serif;

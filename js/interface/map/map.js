@@ -154,6 +154,9 @@ export function removeSourceLayer(map, sourceID) {
     case "choroplethSource":
       layerID = "choropleth";
       break;
+    case "areasSource":
+      layerID = "areas";
+      break;
   }
   if (map.getLayer(layerID)) {
     map.removeLayer(layerID);

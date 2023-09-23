@@ -3,7 +3,10 @@ import { initLayer } from "./map.js";
 import { rightMenuToggle } from "../menu/menu.js";
 import { Dimensions } from "../../util/enums.js";
 import { refreshEntirePanel } from "../menu/sidemenu.js";
-import { getVariableWidthExpression } from "../../expressions.js";
+import {
+  getVariableWidthExpression,
+  getConstantWidthExpression,
+} from "../../expressions.js";
 export function addBoundariesLayer(map) {
   initLayer(map, "boundariesSource");
 }
@@ -25,10 +28,10 @@ export function initClickableWallBehaviour(map) {
   });
 
   // change mouse pointer upon hovering over walls
-  map.on("mouseenter", ["walls3D", "walls2D"], () => {
+  map.on("mouseenter", ["walls3D"], () => {
     map.getCanvas().style.cursor = "pointer";
   });
-  map.on("mouseleave", ["walls3D", "walls2D"], () => {
+  map.on("mouseleave", ["walls3D"], () => {
     map.getCanvas().style.cursor = "";
   });
 }
@@ -83,7 +86,7 @@ function drawBoundaryOutline(map, wall) {
           "line-color": "white",
           "line-width": checkbox.checked
             ? getVariableWidthExpression(5)
-            : getConstantWidthExpression(),
+            : getConstantWidthExpression(5),
         },
       },
       "walls2D"

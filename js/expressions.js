@@ -83,7 +83,7 @@ export function getVariableWidthExpression(boundaryWidth = 0) {
   ];
 }
 
-export function getConstantWidthExpression() {
+export function getConstantWidthExpression(boundaryWidth = 0) {
   // used when colour only is selected
   // all lines should have the same width, but this width needs to be adjusted based on zoom level
 
@@ -93,31 +93,31 @@ export function getConstantWidthExpression() {
     ["zoom"],
     // at zoom lvl 8, line width is 0.1
     8,
-    0.1,
+    0.1 + boundaryWidth,
     // at zoom lvl 9, line width is 0.2
     9,
-    0.2,
+    0.2 + boundaryWidth,
     // at zoom lvl 10, line width is 0.4
     10,
-    0.4,
+    0.4 + boundaryWidth,
     // at zoom lvl 11, line width is 0.8
     11,
-    0.8,
+    0.8 + boundaryWidth,
     // at zoom lvl 12, line width is 1.6
     12,
-    1.6,
+    1.6 + boundaryWidth,
     // at zoom lvl 13, line width is 3.2
     13,
-    3.2,
+    3.2 + boundaryWidth,
     // at zoom lvl 14, line width is 6.4
     14,
-    6.4,
+    6.4 + boundaryWidth,
     // at zoom lvl 15, line width is 12.8
     15,
-    12.8,
+    12.8 + boundaryWidth,
     // at zoom lvl 16, line width is 25.6
     16,
-    25.6,
+    25.6 + boundaryWidth,
   ];
 }
 

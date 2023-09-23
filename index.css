@@ -376,6 +376,7 @@ input[type="file"] {
 
 .menu-right-dropdown {
   width: 100%;
+  font-size: 16px;
 }
 
 .menu-right-content-title {

@@ -73,9 +73,9 @@ export function uploadFromURL2011(map) {
     //////////////////
     GlobalData.indicatorsData = undefined;
     removeSourceLayer(map, "choroplethSource");
-
     removeSourceLayer(map, "wallsSource2D");
     removeSourceLayer(map, "wallsSource3D");
+    removeSourceLayer(map, "areasSource");
     GlobalData.selectedArea = {
       areas: null,
       neighbours: new Set(),
@@ -115,6 +115,7 @@ export function uploadFromURL2016(map) {
     removeSourceLayer(map, "choroplethSource");
     removeSourceLayer(map, "wallsSource2D");
     removeSourceLayer(map, "wallsSource3D");
+    removeSourceLayer(map, "areasSource");
     GlobalData.selectedArea = {
       areas: null,
       neighbours: new Set(),

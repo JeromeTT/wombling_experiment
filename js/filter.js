@@ -134,6 +134,16 @@ function heightCheckboxHandler(map) {
         : getConstantWidthExpression()
     );
   }
+
+  if (map.getLayer("borderOutline")) {
+    map.setPaintProperty(
+      "borderOutline",
+      "line-width",
+      checkbox.checked
+        ? getVariableWidthExpression(5)
+        : getConstantWidthExpression(5)
+    );
+  }
 }
 
 function transparencySliderHandler(map) {

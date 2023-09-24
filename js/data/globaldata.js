@@ -102,7 +102,7 @@ export async function setIndicatorsData(data = null) {
   // Remove all boundaries which do not have indicators assigned to them
   removeUndefinedBoundaries(GlobalData.selectedUnbuffered);
   removeUndefinedBoundaries(GlobalData.selectedBuffered);
-
+  console.log("Removed undefined");
   // PREPROCESS EVERY SINGLE BOUNDARY
   await showLoader(true, "Performing pre-wombling");
   for (let i in GlobalData.selectedUnbuffered.features) {

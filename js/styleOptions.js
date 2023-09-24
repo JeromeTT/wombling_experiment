@@ -89,6 +89,7 @@ function switchStyle(map, styleUrl) {
 }
 
 export function addStyleListeners(map) {
+  return;
   document.getElementById("dark-checkbox").addEventListener("click", () => {
     darkCheckboxHandler(map);
   });

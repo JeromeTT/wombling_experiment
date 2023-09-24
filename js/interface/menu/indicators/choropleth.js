@@ -2,7 +2,6 @@ import { GlobalData } from "../../../data/globaldata.js";
 import { initLayer, initSource } from "../../map/map.js";
 
 export function updateChoropleth(map) {
-  const indicator = document.getElementById("choropleth-indicatorChange");
   if (
     GlobalData.indicatorsData == null ||
     GlobalData.indicatorsData == undefined

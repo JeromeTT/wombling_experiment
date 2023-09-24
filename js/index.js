@@ -19,7 +19,7 @@ import { addStyleListeners } from "./styleOptions.js";
 
 import { initLegend as initLegend } from "./interface/map/legend.js";
 import { GlobalData, setIndicatorsData } from "./data/globaldata.js";
-import { changeBG, uploadFromURL } from "./upload.js";
+import { changeBG, uploadFromURL2011, uploadFromURL2016 } from "./upload.js";
 import { showLoader } from "./interface/loader.js";
 import {
   eventHover,
@@ -122,9 +122,33 @@ map.on("load", () => {
   addInputListeners(map);
   addStyleListeners(map);
 
-  uploadFromURL(map);
+  uploadFromURL2011(map);
+  uploadFromURL2016(map);
   console.log(d3.interpolateRdYlGn(2));
 
+  // Add hover text on wombling selection options
+  eventHover(
+    "csvAuto2011-parent",
+    "This data set uses the SA1 (Statistical Area 1) boundaries with 2011 indicators." +
+      "<br> This data set contains: 1 urban liveability index, 15 raw indicators and 15 normalised indicators." +
+      "<br> The normalised indicators used in the urban liveability index calculation will be preselected on load."
+  );
+
+  eventHover(
+    "csvAuto2016-parent",
+    "This data set uses the SA1 (Statistical Area 1) boundaries with 2016 indicators." +
+      "<br> This data set contains: 1 urban liveability index and 7 indicators." +
+      "<br> The indicators will be preselected on load."
+  );
+
+  eventHover(
+    "custom-text",
+    "The first column must contain area codes. All other columns must contain variable data."
+  );
+  eventHover(
+    "indicator-options-tooltip",
+    'Womble indicator options will only take effect upon clicking "Run".'
+  );
   eventHover(
     "normalize-container",
     "Normalises the boundary differences using an exponential distribution. <br> Attempts to provide a more uniform distribution while retaining significant values."

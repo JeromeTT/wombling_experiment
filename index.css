@@ -215,6 +215,7 @@ input[type="file"] {
   position: absolute;
   bottom: 0;
   right: 0;
+  width: 300px;
   background: #fff;
   margin-right: 20px;
   font-family: Arial, sans-serif;
@@ -284,7 +285,24 @@ input[type="file"] {
   border: 1px solid black;
 }
 .hoverValue-table th {
+  text-align: center;
   border: 1px solid black;
+}
+.hoverValue-table td:nth-child(1) {
+  text-align: center;
+}
+.hoverValue-table td:nth-child(4) {
+  text-align: center;
+}
+.hoverValue-table td:nth-child(5) {
+  font-size: 16px;
+  text-align: center;
+}
+.hoverValue-table tr:nth-last-child(1) {
+  font-size: 16px;
+}
+.hoverValue-table tr:nth-child(1) {
+  font-size: 14px;
 }
 .hoverable:hover #dynamicTooltip {
   opacity: 1;
@@ -375,6 +393,7 @@ input[type="file"] {
 
 .menu-right-dropdown {
   width: 100%;
+  font-size: 16px;
 }
 
 .menu-right-content-title {

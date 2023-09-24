@@ -16,7 +16,6 @@ export function getColourExpression() {
     result.push(colors(i));
   }
   result.push(colors(0));
-  console.log("result color scale", result);
   return result;
 }
 
@@ -40,7 +39,6 @@ export function getChoroplethColourExpression(indicator) {
     result.push(min + (i / n) * (max - min));
     result.push(colors(i));
   }
-  console.log("choropleth color scale", result);
   return result;
 }
 

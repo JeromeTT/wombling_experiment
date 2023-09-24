@@ -117,7 +117,6 @@ export function initLayer(map, sourceID, before = null) {
         "choropleth-indicatorChange"
       ).value;
       const active = document.getElementById("choropleth-checkbox").checked;
-      console.log("checkbox!!!", active);
       layer = {
         ...layer,
         id: "choropleth",
@@ -133,7 +132,6 @@ export function initLayer(map, sourceID, before = null) {
       }
       break;
   }
-  console.log("Adding layer", sourceID, layer);
 
   if (before == null) {
     map.addLayer(layer);

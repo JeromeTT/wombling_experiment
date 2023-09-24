@@ -166,7 +166,6 @@ function addDependendentSliderBehaviour() {
       for (let j = 0; j < sliders.length; j++) {
         testSum += parseFloat(sliders[j].value);
       }
-      console.log(`Sum indicator values: ${testSum}`);
     });
   }
 }

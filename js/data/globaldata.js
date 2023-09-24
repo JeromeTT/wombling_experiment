@@ -93,16 +93,13 @@ export async function setIndicatorsData(data = null) {
     value.properties = { ...value.properties, ...GlobalData.indicatorsData[i] };
   }
 
-  console.log(GlobalData.selectedAreas);
   await showLoader(true, "Starting data preprocessing");
   const headers = GlobalData.indicatorsHeaders;
   // Normalise everything?
-  console.log("Indicators Data", GlobalData.indicatorsData);
   await showLoader(true, "Removing non-indicator boundaries");
   // Remove all boundaries which do not have indicators assigned to them
   removeUndefinedBoundaries(GlobalData.selectedUnbuffered);
   removeUndefinedBoundaries(GlobalData.selectedBuffered);
-  console.log("Removed undefined");
   // PREPROCESS EVERY SINGLE BOUNDARY
   await showLoader(true, "Performing pre-wombling");
   for (let i in GlobalData.selectedUnbuffered.features) {
@@ -145,8 +142,6 @@ export async function setIndicatorsData(data = null) {
   rankDataColumns(GlobalData.selectedUnbuffered.features, headers);
   rankDataColumns(GlobalData.selectedBuffered.features, headers);
 
-  console.log("ALL BOUNDARIES UNBUFFERED", GlobalData.selectedUnbuffered);
-  console.log("ALL BOUNDARIES BUFFERED", GlobalData.selectedBuffered);
   await showLoader(false);
   createVariables(headers);
 }

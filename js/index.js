@@ -66,12 +66,7 @@ export function areaDropDownHandler(map) {
 
   // Re-init map boundaries
   initSource(map, GlobalData.selectedAreas, "boundariesSource");
-  console.log("Map boundaries initialised");
   initSource(map, GlobalData.selectedAreas, "areasSource");
-  console.log("Map areas initialised");
-
-  console.log("UNBUFFERED", GlobalData.selectedUnbuffered);
-  console.log("BUFFERED", GlobalData.selectedBuffered);
   // Pre-womble data again:
   setIndicatorsData();
   // button for drawing the edge heights based on womble calculation
@@ -110,7 +105,6 @@ resetWeightsButton.addEventListener("click", setDefaultWeights);
 
 // When map loads, do...
 map.on("load", () => {
-  console.log("Loaded");
   document.getElementById("areasSelect").addEventListener("change", () => {
     areaDropDownHandler(map);
   });
@@ -124,7 +118,6 @@ map.on("load", () => {
 
   uploadFromURL2011(map);
   uploadFromURL2016(map);
-  console.log(d3.interpolateRdYlGn(2));
 
   // Add hover text on wombling selection options
   eventHover(

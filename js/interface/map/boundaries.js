@@ -25,7 +25,6 @@ export function addAreasLayer(map) {
 export function initClickableWallBehaviour(map) {
   map.on("click", ["walls3D"], (e) => {
     let wall = e.features[0];
-    console.log(e.features[0].geometry);
     map.removeFeatureState({ source: "areasSource" });
     wallClicked(map, wall);
   });

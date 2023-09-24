@@ -78,20 +78,26 @@ export async function setIndicatorsData(data = null) {
   if (GlobalData.indicatorsData == undefined) {
     return;
   }
-
-  // This assumes that the data is ordered...
-  // Risky stuff
-  // TODO: FIX
-  // Appends the newly loaded indicator data into the existing area dataset
-  // Used for choropleth
-  removeUndefinedAreas();
-  GlobalData.selectedAreas.features.sort((a, b) => a.id.localeCompare(b.id));
-  GlobalData.indicatorsData.sort((a, b) =>
-    a[GlobalData.csvAreaID].localeCompare(b[GlobalData.csvAreaID])
-  );
-  for (let [i, value] of GlobalData.selectedAreas.features.entries()) {
-    value.properties = { ...value.properties, ...GlobalData.indicatorsData[i] };
+  // The glorious hash map
+  const globalIndicatorTestMap = new Map();
+  for (let i of GlobalData.indicatorsData) {
+    globalIndicatorTestMap.set(i.sa1, i);
   }
+
+  // Used for choropleth
+  var startTime = performance.now();
+  removeUndefinedAreas(globalIndicatorTestMap);
+  GlobalData.selectedAreas.features = GlobalData.selectedAreas.features.map(
+    (row) => {
+      row.properties = {
+        ...row.properties,
+        ...globalIndicatorTestMap.get(row.id),
+      };
+      return row;
+    }
+  );
+  var endTime = performance.now();
+  console.log("Choropleth preprocessing", endTime - startTime);
 
   console.log(GlobalData.selectedAreas);
   await showLoader(true, "Starting data preprocessing");
@@ -99,20 +105,27 @@ export async function setIndicatorsData(data = null) {
   // Normalise everything?
   console.log("Indicators Data", GlobalData.indicatorsData);
   await showLoader(true, "Removing non-indicator boundaries");
+
   // Remove all boundaries which do not have indicators assigned to them
-  removeUndefinedBoundaries(GlobalData.selectedUnbuffered);
-  removeUndefinedBoundaries(GlobalData.selectedBuffered);
-  console.log("Removed undefined");
-  // PREPROCESS EVERY SINGLE BOUNDARY
+  var startTime = performance.now();
+  removeUndefinedBoundaries(
+    GlobalData.selectedUnbuffered,
+    globalIndicatorTestMap
+  );
+  removeUndefinedBoundaries(
+    GlobalData.selectedBuffered,
+    globalIndicatorTestMap
+  );
+  var endTime = performance.now();
+  console.log("Removed undefined", endTime - startTime);
+
   await showLoader(true, "Performing pre-wombling");
+  startTime = performance.now();
+  // PREPROCESS EVERY SINGLE BOUNDARY
   for (let i in GlobalData.selectedUnbuffered.features) {
     let boundary = GlobalData.selectedUnbuffered.features[i];
-    let row1 = GlobalData.indicatorsData.find(
-      (row) => row["sa1"] == boundary.properties.sa1_id1
-    );
-    let row2 = GlobalData.indicatorsData.find(
-      (row) => row["sa1"] == boundary.properties.sa1_id2
-    );
+    let row1 = globalIndicatorTestMap.get(boundary.properties.sa1_id1);
+    let row2 = globalIndicatorTestMap.get(boundary.properties.sa1_id2);
     boundary["raw"] = {};
     for (let header of headers) {
       boundary["raw"][header] = Math.abs(row1[header] - row2[header]);
@@ -120,30 +133,37 @@ export async function setIndicatorsData(data = null) {
   }
   for (let i in GlobalData.selectedBuffered.features) {
     let boundary = GlobalData.selectedBuffered.features[i];
-    let row1 = GlobalData.indicatorsData.find(
-      (row) => row["sa1"] == boundary.properties.sa1_id1
-    );
-    let row2 = GlobalData.indicatorsData.find(
-      (row) => row["sa1"] == boundary.properties.sa1_id2
-    );
+    let row1 = globalIndicatorTestMap.get(boundary.properties.sa1_id1);
+    let row2 = globalIndicatorTestMap.get(boundary.properties.sa1_id2);
     boundary["raw"] = {};
     for (let header of headers) {
       boundary["raw"][header] = Math.abs(row1[header] - row2[header]);
     }
   }
+  endTime = performance.now();
+  console.log("TIMING", endTime - startTime);
 
   await showLoader(true, "Performing data scaling");
   // SCALE EVERY BOUNDARY
+  startTime = performance.now();
   scaleDataColumns(GlobalData.selectedUnbuffered.features, headers);
   scaleDataColumns(GlobalData.selectedBuffered.features, headers);
+  endTime = performance.now();
+  console.log("Scaling", endTime - startTime);
 
   await showLoader(true, "Performing data normalisation");
+  startTime = performance.now();
   normaliseDataColumns(GlobalData.selectedUnbuffered.features, headers);
   normaliseDataColumns(GlobalData.selectedBuffered.features, headers);
+  endTime = performance.now();
+  console.log("Norm", endTime - startTime);
 
   await showLoader(true, "Performing data ranking");
+  startTime = performance.now();
   rankDataColumns(GlobalData.selectedUnbuffered.features, headers);
   rankDataColumns(GlobalData.selectedBuffered.features, headers);
+  endTime = performance.now();
+  console.log("Rank", endTime - startTime);
 
   console.log("ALL BOUNDARIES UNBUFFERED", GlobalData.selectedUnbuffered);
   console.log("ALL BOUNDARIES BUFFERED", GlobalData.selectedBuffered);
@@ -151,28 +171,27 @@ export async function setIndicatorsData(data = null) {
   createVariables(headers);
 }
 
-function removeUndefinedBoundaries(source) {
+function removeUndefinedBoundaries(source, indicatorHashMap) {
+  // Convert IDs to Strings
+  source.features.forEach((row) => {
+    row.properties.sa1_id1 = row.properties.sa1_id1 + "";
+  });
+  source.features.forEach((row) => {
+    row.properties.sa1_id2 = row.properties.sa1_id2 + "";
+  });
+
   source.features = source.features.filter((boundary) => {
-    let row1 = GlobalData.indicatorsData.find(
-      (row) => row["sa1"] == boundary.properties.sa1_id1
+    return (
+      indicatorHashMap.has(boundary.properties.sa1_id1) &&
+      indicatorHashMap.has(boundary.properties.sa1_id2)
     );
-    let row2 = GlobalData.indicatorsData.find(
-      (row) => row["sa1"] == boundary.properties.sa1_id2
-    );
-    return row1 != undefined && row2 != undefined;
   });
 }
 
-function removeUndefinedAreas() {
+function removeUndefinedAreas(indicatorHashMap) {
   GlobalData.selectedAreas.features = GlobalData.selectedAreas.features.filter(
     (area) => {
-      const found = GlobalData.indicatorsData.find(
-        (row) =>
-          row[GlobalData.csvAreaID] ==
-          area.properties[GlobalData.geojsonAreaCode]
-      );
-
-      return found != undefined;
+      return indicatorHashMap.has(area.properties[GlobalData.geojsonAreaCode]);
     }
   );
 }

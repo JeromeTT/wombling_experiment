@@ -121,8 +121,8 @@ export function getConstantWidthExpression(boundaryWidth = 0) {
   ];
 }
 
-export function getHeightExpression() {
+export function getHeightExpression(offset = 0) {
   // mapbox expression to multiply each feature's womble property with some constant to calculate the height drawn
   const HEIGHT_MULTIPLIER = 5000;
-  return ["*", ["get", "womble_scaled"], HEIGHT_MULTIPLIER];
+  return ["+", ["*", ["get", "womble_scaled"], HEIGHT_MULTIPLIER], offset];
 }

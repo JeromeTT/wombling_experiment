@@ -88,7 +88,13 @@ export function updatePopupMenuBoundary(wall) {
     const differenceWeighted = (difference * weight) / 100;
     const differenceContribution =
       (differenceWeighted / wall.properties.womble) * 100;
-
+    let val = Math.abs(differenceContribution - weight) / weight;
+    let glyph = "";
+    if (differenceContribution > weight) {
+      glyph = "↑".repeat(Math.min(3, Math.floor(val / 0.3333)));
+    } else if (differenceContribution < weight) {
+      glyph = "↓".repeat(Math.min(3, Math.floor(val / 0.333)));
+    }
     // Set title
     const child = areaDiv.appendChild(document.createElement("div"));
     child.setAttribute("id", id1 + id2 + variable);
@@ -98,12 +104,12 @@ export function updatePopupMenuBoundary(wall) {
     histogramtext.setHTML(
       `<table class="boundary-table">
           <tr>
-            <th style="width:50%"> Actual contribution</th>
-            <th>Wombled contribution</th>
+            <th>Weight</th>
+            <th style="width:50%"> Contribution</th>
           </tr>
           <tr>
-            <td>${differenceContribution.toFixed(2)}%</td>
-            <td>${weight.toFixed(2)}%</td>
+          <td>${weight.toFixed(2)}%</td>
+            <td>${differenceContribution.toFixed(2)}%  ${glyph}</td>
           </tr>
        </table>`
     );
@@ -182,7 +188,7 @@ export function updatePopupMenuWomble(wall) {
       <th> Weight%</th>
       <th> Indicator</th>
       <th> Value</th>
-      <th> Contribution%</th>
+      <th colspan="2"> Contribution%</th>
     </tr>`;
   let total = 0;
   const weights = retrieveIndicatorSliders();
@@ -201,7 +207,19 @@ export function updatePopupMenuWomble(wall) {
     } else {
       color = (x) => "white";
     }
+
     let val = Math.abs(differenceContribution - weight) / weight;
+    let glyph = "";
+    if (differenceContribution > weight) {
+      glyph = "↑".repeat(Math.min(3, Math.floor(val / 0.3333)));
+    } else if (differenceContribution < weight) {
+      glyph = "↓".repeat(Math.min(3, Math.floor(val / 0.333)));
+    } else {
+      glyph = "-";
+    }
+    if (glyph == "") {
+      glyph = "-";
+    }
     let textColor = val > 0.5 ? "white" : "black";
     total += differenceWeighted;
     list = list.concat(`    
@@ -214,14 +232,19 @@ export function updatePopupMenuWomble(wall) {
     )}% * ${difference.toFixed(3)}</th>
       <td style="background-color: ${color(
         val
-      )}; color: ${textColor}"> ${differenceContribution.toFixed(2)}%</th>
+      )}; color: ${textColor}; border-right: 0px"> ${differenceContribution.toFixed(
+      2
+    )}%</th>
+      <td style="background-color: ${color(
+        val
+      )}; color: ${textColor};border-left: 0px">${glyph}</td>
     </tr>`);
   }
 
   list = list.concat(`<tr>
     <td colspan="2">Total:</th>
     <td> ${total.toFixed(3)}</th>
-    <td>100.00%</th>
+    <td colspan="2">100.00%</th>
   </tr>`);
   eventHover(
     "value-rawWomble",

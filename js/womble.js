@@ -20,6 +20,7 @@ import { findBoundary } from "./interface/map/areas.js";
 export function runWomble(map, source2D, source3D) {
   GlobalData.selectedVariables = GlobalData.getWombleIndicators();
   GlobalData.test = source2D.features;
+  GlobalData.test2 = source3D.features;
   generateWombleFeaturesData(source2D, source3D);
   initSource(
     map,

@@ -6,7 +6,10 @@ import { refreshEntirePanel } from "../menu/sidemenu.js";
 import {
   getVariableWidthExpression,
   getConstantWidthExpression,
+  getColourExpression,
+  getHeightExpression,
 } from "../../expressions.js";
+import { findBoundary } from "./areas.js";
 export function addBoundariesLayer(map) {
   initLayer(map, "boundariesSource");
 }
@@ -58,18 +61,23 @@ export function wallClicked(map, wall) {
 
   // If in 2D mode, highlight the boundary
   if (GlobalData.appDimension == Dimensions.TWO_D) {
+    removeBoundaryOutline(map);
     drawBoundaryOutline(map, wall);
   } else if (GlobalData.appDimension == Dimensions.THREE_D) {
     removeBoundaryOutline(map);
+    drawBoundaryOutline(map, wall);
   }
   rightMenuToggle(true);
 }
 
 function drawBoundaryOutline(map, wall) {
   if (map.getLayer("borderOutline")) {
-    map.getSource("borderOutlineSource").setData(wall);
-  } else {
-    let checkbox = document.getElementById(`height-checkbox`);
+    map.removeLayer("borderOutline");
+    map.removeSource("borderOutlineSource");
+  }
+  let checkbox = document.getElementById(`height-checkbox`);
+
+  if (GlobalData.appDimension == Dimensions.TWO_D) {
     map.addSource("borderOutlineSource", {
       type: "geojson",
       data: wall,
@@ -90,6 +98,25 @@ function drawBoundaryOutline(map, wall) {
         },
       },
       "walls2D"
+    );
+  } else {
+    map.addSource("borderOutlineSource", {
+      type: "geojson",
+      data: wall,
+    });
+    map.addLayer(
+      {
+        id: "borderOutline",
+        type: "fill-extrusion",
+        source: "borderOutlineSource",
+        paint: {
+          "fill-extrusion-color": "white",
+          "fill-extrusion-height": getHeightExpression(400),
+          "fill-extrusion-base": getHeightExpression(),
+          "fill-extrusion-opacity": 1,
+        },
+      },
+      "walls3D"
     );
   }
 }

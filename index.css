@@ -285,7 +285,24 @@ input[type="file"] {
   border: 1px solid black;
 }
 .hoverValue-table th {
+  text-align: center;
   border: 1px solid black;
+}
+.hoverValue-table td:nth-child(1) {
+  text-align: center;
+}
+.hoverValue-table td:nth-child(4) {
+  text-align: center;
+}
+.hoverValue-table td:nth-child(5) {
+  font-size: 16px;
+  text-align: center;
+}
+.hoverValue-table tr:nth-last-child(1) {
+  font-size: 26px;
+}
+.hoverValue-table tr:nth-child(1) {
+  font-size: 14px;
 }
 .hoverable:hover #dynamicTooltip {
   opacity: 1;

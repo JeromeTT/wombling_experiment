@@ -108,30 +108,17 @@ export function initClickableAreaBehaviour(map) {
 }
 
 export function findBoundary(map, id1, id2) {
-  console.log(GlobalData.test);
-  let wall = GlobalData.test.find(
+  let data =
+    GlobalData.appDimension == Dimensions.TWO_D
+      ? GlobalData.test
+      : GlobalData.test2;
+  console.log(data);
+  let wall = data.find(
     (elem) =>
       (elem.properties["sa1_id1"] == id1 &&
         elem.properties["sa1_id2"] == id2) ||
       (elem.properties["sa1_id1"] == id2 && elem.properties["sa1_id2"] == id1)
   );
-  // let wall = map.queryRenderedFeatures({
-  //   layers: ["walls2D"],
-  //   filter: [
-  //     "any",
-  //     [
-  //       "all",
-  //       ["==", ["to-string", ["get", "sa1_id1"]], id1],
-  //       ["==", ["to-string", ["get", "sa1_id2"]], id2],
-  //     ],
-  //     [
-  //       "all",
-  //       ["==", ["to-string", ["get", "sa1_id1"]], id2],
-  //       ["==", ["to-string", ["get", "sa1_id2"]], id1],
-  //     ],
-  //   ],
-  // });
-  // wall = wall.length > 0 ? wall[0] : null;
   console.log("wall", wall);
   return wall;
 }

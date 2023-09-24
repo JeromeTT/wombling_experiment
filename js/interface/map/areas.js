@@ -52,7 +52,7 @@ export function initClickableAreaBehaviour(map) {
       let id1 = GlobalData.selectedArea.areas;
       let id2 = areaCode;
       let wall = findBoundary(map, id1, id2);
-      wallClicked(map, wall);
+      wallClicked(map, wall, id1, id2);
       hideHelperText();
     } else if (GlobalData.selectedArea.areas == areaCode) {
       // Clear GlobalData

@@ -39,12 +39,16 @@ export function initClickableWallBehaviour(map) {
   });
 }
 
-export function wallClicked(map, wall) {
+export function wallClicked(map, wall, id1 = null, id2 = null) {
   // If in 3D mode,
   let areaIds = [
     wall.properties.sa1_id1.toString(),
     wall.properties.sa1_id2.toString(),
   ];
+
+  if (id1 != null && id2 != null) {
+    areaIds = [id1, id2];
+  }
   GlobalData.selectedArea = {
     areas: areaIds,
     neighbours: new Set(),
@@ -110,9 +114,8 @@ function drawBoundaryOutline(map, wall) {
         type: "fill-extrusion",
         source: "borderOutlineSource",
         paint: {
-          "fill-extrusion-color": "white",
-          "fill-extrusion-height": getHeightExpression(400),
-          "fill-extrusion-base": getHeightExpression(),
+          "fill-extrusion-color": getColourExpression(),
+          "fill-extrusion-height": getHeightExpression(),
           "fill-extrusion-opacity": 1,
         },
       },

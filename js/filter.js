@@ -135,7 +135,10 @@ function heightCheckboxHandler(map) {
     );
   }
 
-  if (map.getLayer("borderOutline")) {
+  if (
+    map.getLayer("borderOutline") &&
+    GlobalData.appDimension == Dimensions.TWO_D
+  ) {
     map.setPaintProperty(
       "borderOutline",
       "line-width",

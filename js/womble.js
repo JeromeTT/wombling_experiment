@@ -65,7 +65,6 @@ function generateWombleFeaturesData(source2D, source3D) {
   // handling the case where the max womble is somehow zero, i dont think this should ever happen
   let maxWomble = d3.max(generatedWombleValues, (d) => d.womble);
   if (maxWomble == 0) {
-    console.log("Max womble value in this data set is zero");
     showLoader(true, "Error: Max womble = 0");
     return;
   }
@@ -89,7 +88,6 @@ function generateWombleFeaturesData(source2D, source3D) {
     source2D.features[i]["properties"]["womble_scaled"] =
       source2D.features[i]["properties"]["womble"] / maxWomble;
   }
-  console.log("Feature Data?", source2D, source3D);
 }
 
 /**
@@ -166,9 +164,7 @@ export class DimensionToggle {
       } else if (GlobalData.appDimension == Dimensions.THREE_D) {
         this.#switchTo2d(map);
       }
-      console.log("dims", GlobalData.appDimension);
       if (Array.isArray(GlobalData.selectedArea.areas)) {
-        console.log("CLICKEDDDD");
         wallClicked(
           map,
           findBoundary(

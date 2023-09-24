@@ -85,7 +85,7 @@ export async function setIndicatorsData(data = null) {
   }
 
   // Used for choropleth
-  var startTime = performance.now();
+
   removeUndefinedAreas(globalIndicatorTestMap);
   GlobalData.selectedAreas.features = GlobalData.selectedAreas.features.map(
     (row) => {
@@ -96,18 +96,13 @@ export async function setIndicatorsData(data = null) {
       return row;
     }
   );
-  var endTime = performance.now();
-  console.log("Choropleth preprocessing", endTime - startTime);
 
-  console.log(GlobalData.selectedAreas);
   await showLoader(true, "Starting data preprocessing");
   const headers = GlobalData.indicatorsHeaders;
   // Normalise everything?
-  console.log("Indicators Data", GlobalData.indicatorsData);
   await showLoader(true, "Removing non-indicator boundaries");
 
   // Remove all boundaries which do not have indicators assigned to them
-  var startTime = performance.now();
   removeUndefinedBoundaries(
     GlobalData.selectedUnbuffered,
     globalIndicatorTestMap
@@ -116,11 +111,8 @@ export async function setIndicatorsData(data = null) {
     GlobalData.selectedBuffered,
     globalIndicatorTestMap
   );
-  var endTime = performance.now();
-  console.log("Removed undefined", endTime - startTime);
 
   await showLoader(true, "Performing pre-wombling");
-  startTime = performance.now();
   // PREPROCESS EVERY SINGLE BOUNDARY
   for (let i in GlobalData.selectedUnbuffered.features) {
     let boundary = GlobalData.selectedUnbuffered.features[i];
@@ -140,33 +132,20 @@ export async function setIndicatorsData(data = null) {
       boundary["raw"][header] = Math.abs(row1[header] - row2[header]);
     }
   }
-  endTime = performance.now();
-  console.log("TIMING", endTime - startTime);
 
   await showLoader(true, "Performing data scaling");
   // SCALE EVERY BOUNDARY
-  startTime = performance.now();
   scaleDataColumns(GlobalData.selectedUnbuffered.features, headers);
   scaleDataColumns(GlobalData.selectedBuffered.features, headers);
-  endTime = performance.now();
-  console.log("Scaling", endTime - startTime);
 
   await showLoader(true, "Performing data normalisation");
-  startTime = performance.now();
   normaliseDataColumns(GlobalData.selectedUnbuffered.features, headers);
   normaliseDataColumns(GlobalData.selectedBuffered.features, headers);
-  endTime = performance.now();
-  console.log("Norm", endTime - startTime);
 
   await showLoader(true, "Performing data ranking");
-  startTime = performance.now();
   rankDataColumns(GlobalData.selectedUnbuffered.features, headers);
   rankDataColumns(GlobalData.selectedBuffered.features, headers);
-  endTime = performance.now();
-  console.log("Rank", endTime - startTime);
 
-  console.log("ALL BOUNDARIES UNBUFFERED", GlobalData.selectedUnbuffered);
-  console.log("ALL BOUNDARIES BUFFERED", GlobalData.selectedBuffered);
   await showLoader(false);
   createVariables(headers);
 }

@@ -32,8 +32,6 @@ export function changeBG(e) {
 
   let papaParseCallback = function (results) {
     let headers = Object.keys(results.data[0]);
-    console.log("papa", results.data);
-    console.log(headers);
     setIndicatorsData(results);
   };
 
@@ -52,17 +50,13 @@ function csvToArr(stringVal, splitter) {
     .map((item) => item.split(splitter));
 
   const headers = Object.values(keys);
-  console.log(headers);
 
   const formedArr = rest.map((item) => {
     const object = {};
     keys.forEach((key, index) => (object[key] = parseFloat(item.at(index))));
     return object;
   });
-  console.log([formedArr, headers]);
   return [formedArr, headers];
-
-  // return formedArr;
 }
 
 export function uploadFromURL2011(map) {

@@ -11,7 +11,6 @@ export function updateChoropleth(map) {
   if (map.getSource("choroplethSource")) {
     initLayer(map, "choroplethSource", "boundaries");
   } else {
-    console.log("UPDATING SOURCE!!!!!!!!!!!!!!!!!!!!!!!!");
     initSource(map, GlobalData.selectedAreas, "choroplethSource", "boundaries");
   }
 }

@@ -21,7 +21,6 @@ export function initClickableAreaBehaviour(map) {
     }
 
     if (!map.getSource("wallsSource2D")) {
-      console.log("walls don't exist yet");
       return;
     }
     let area = e.features[0];
@@ -112,13 +111,11 @@ export function findBoundary(map, id1, id2) {
     GlobalData.appDimension == Dimensions.TWO_D
       ? GlobalData.test
       : GlobalData.test2;
-  console.log(data);
   let wall = data.find(
     (elem) =>
       (elem.properties["sa1_id1"] == id1 &&
         elem.properties["sa1_id2"] == id2) ||
       (elem.properties["sa1_id1"] == id2 && elem.properties["sa1_id2"] == id1)
   );
-  console.log("wall", wall);
   return wall;
 }

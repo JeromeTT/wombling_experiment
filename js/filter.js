@@ -160,7 +160,6 @@ function transparencySliderHandler(map) {
   transparencySliderValue.textContent = transparencySlider.value + "%";
 
   if (!map.getLayer("walls2D")) {
-    console.log("Layer doesn't exist");
     return;
   }
 
@@ -191,7 +190,6 @@ function minMaxSliderHandler(map) {
 
   // automatically adjust slider if user makes min > max
   if (parseFloat(minSlider.value) > parseFloat(maxSlider.value)) {
-    console.log("Max must be greater than or equal to min");
     // maxSlider.value = minSlider.value;
     minSlider.value = maxSlider.value;
   }
@@ -204,7 +202,6 @@ function minMaxSliderHandler(map) {
   maxSliderValue.textContent = max;
 
   if (!map.getLayer("walls2D")) {
-    console.log("No walls to filter yet");
     return;
   }
 
@@ -260,7 +257,6 @@ export class darkModeToggle {
     this._btn.addEventListener("click", () => {
       // if light, change to dark
       if (this._mode == LightModes.LIGHT) {
-        console.log(map.getStyle());
         let currentStyle = map.getStyle();
 
         this._mode = LightModes.DARK;

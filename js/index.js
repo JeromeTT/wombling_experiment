@@ -26,6 +26,7 @@ import {
   menuInitDropdownBehaviour,
 } from "./interface/menu/sidemenu.js";
 import { choroplethSelectionHandler } from "./interface/menu/indicators/choropleth.js";
+import { yieldToMain } from "./util/yield.js";
 
 // Could also use fetch instead of import
 // fetch("./boundaries_SA1_2016.geojson")
@@ -63,12 +64,12 @@ export function areaDropDownHandler(map) {
   for (let feature of GlobalData.selectedAreas.features) {
     feature.id = feature.properties[GlobalData.geojsonAreaCode];
   }
-
+  // Pre-womble data again:
+  setIndicatorsData();
   // Re-init map boundaries
   initSource(map, GlobalData.selectedAreas, "boundariesSource");
   initSource(map, GlobalData.selectedAreas, "areasSource");
-  // Pre-womble data again:
-  setIndicatorsData();
+
   // button for drawing the edge heights based on womble calculation
   closeExistingPopups(map);
   choroplethSelectionHandler(map);

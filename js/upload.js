@@ -2,7 +2,7 @@ import { GlobalData, setIndicatorsData } from "./data/globaldata.js";
 import Papa from "https://cdn.skypack.dev/papaparse@5.3.0";
 import { areaDropDownHandler } from "./index.js";
 import { updateChoropleth } from "./interface/menu/indicators/choropleth.js";
-import { removeSourceLayer } from "./interface/map/map.js";
+import { initSource, removeSourceLayer } from "./interface/map/map.js";
 import { removeBoundaryOutline } from "./interface/map/boundaries.js";
 import { clearPopupMenuArea } from "./interface/menu/sidemenu.js";
 import { variableCheckboxHandler } from "./interface/menu/indicators/variableOptions.js";
@@ -95,6 +95,8 @@ export function uploadFromURL2011(map) {
         checkbox.checked = true;
       }
       variableCheckboxHandler();
+      initSource(map, GlobalData.selectedAreas, "boundariesSource");
+      initSource(map, GlobalData.selectedAreas, "areasSource");
     });
     customTxt.innerHTML = "liveability_sa1_2011.csv";
   });
@@ -133,6 +135,8 @@ export function uploadFromURL2016(map) {
         checkbox.checked = true;
       }
       variableCheckboxHandler();
+      initSource(map, GlobalData.selectedAreas, "boundariesSource");
+      initSource(map, GlobalData.selectedAreas, "areasSource");
     });
     customTxt.innerHTML = "liveability_sa1_2016.csv";
     updateChoropleth(map);

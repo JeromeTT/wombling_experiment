@@ -42,7 +42,6 @@ export function runWomble(map, source2D, source3D) {
   // Hide boundaries directly after running womble
   document.getElementById("boundaries-checkbox").checked = false;
   runAllInputHandlers(map);
-  closeExistingPopups(map);
   showHelperText(HELPERTEXT.DEFAULT);
   refreshEntirePanel(map);
 }
@@ -58,8 +57,32 @@ function generateWombleFeaturesData(source2D, source3D) {
   let generatedWombleValues = [];
   let sliders = retrieveIndicatorSliders();
   // create array of womble values for each edge
+
+  // retrieve the user's selected indicator names and weights
+  let selectedIndicators = [];
+  let indicatorWeights = [];
+  for (let slider of sliders) {
+    selectedIndicators.push(slider.getAttribute("indicatorname")); // each slider was previously created with an "indicatorname" attribute
+    indicatorWeights.push(parseFloat(slider.value) / 100); // divide by 100 b/c the slider values are percentages
+  }
+
+  let stat = "raw";
+  if (document.getElementById("normalize-checkbox").checked) {
+    stat = "normalised";
+  } else if (document.getElementById("rank-checkbox").checked) {
+    stat = "rank";
+  }
+
   for (let edge of source2D["features"]) {
-    generatedWombleValues.push(calculateWomble(edge, sliders));
+    generatedWombleValues.push(
+      calculateWomble(
+        edge,
+        selectedIndicators,
+        indicatorWeights,
+        stat,
+        isDistanceWeighted()
+      )
+    );
   }
 
   // handling the case where the max womble is somehow zero, i dont think this should ever happen
@@ -79,10 +102,8 @@ function generateWombleFeaturesData(source2D, source3D) {
 
   // Assign the values in place
   for (let i in generatedWombleValues) {
-    for (let [key, value] of Object.entries(generatedWombleValues[i])) {
-      source2D.features[i]["properties"][key] = value;
-      source3D.features[i]["properties"][key] = value;
-    }
+    Object.assign(source2D.features[i]["properties"], generatedWombleValues[i]);
+    Object.assign(source3D.features[i]["properties"], generatedWombleValues[i]);
     source3D.features[i]["properties"]["womble_scaled"] =
       source3D.features[i]["properties"]["womble"] / maxWomble;
     source2D.features[i]["properties"]["womble_scaled"] =
@@ -95,27 +116,21 @@ function generateWombleFeaturesData(source2D, source3D) {
  * @param {Number} edge object corresponding to the edge that the womble calculation is being done for
  * @returns {Number} womble value
  */
-function calculateWomble(edge, sliders) {
-  // retrieve the user's selected indicator names and weights
-  let selectedIndicators = [];
-  let indicatorWeights = [];
+function calculateWomble(
+  edge,
+  selectedIndicators,
+  indicatorWeights,
+  stat,
+  isDistanceWeighted
+) {
   let featureList = { womble: 0 };
-  for (let slider of sliders) {
-    selectedIndicators.push(slider.getAttribute("indicatorname")); // each slider was previously created with an "indicatorname" attribute
-    indicatorWeights.push(parseFloat(slider.value) / 100); // divide by 100 b/c the slider values are percentages
-  }
-  let stat = edge.raw;
-  if (document.getElementById("normalize-checkbox").checked) {
-    stat = edge.normalised;
-  } else if (document.getElementById("rank-checkbox").checked) {
-    stat = edge.rank;
-  }
+
   for (let i in selectedIndicators) {
-    if (isDistanceWeighted()) {
+    if (isDistanceWeighted) {
       featureList[selectedIndicators[i]] =
-        stat[selectedIndicators[i]] / edge.properties.distance;
+        edge[stat][selectedIndicators[i]] / edge.properties.distance;
     } else {
-      featureList[selectedIndicators[i]] = stat[selectedIndicators[i]];
+      featureList[selectedIndicators[i]] = edge[stat][selectedIndicators[i]];
     }
     featureList.womble +=
       indicatorWeights[i] * featureList[selectedIndicators[i]];

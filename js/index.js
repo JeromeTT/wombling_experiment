@@ -159,8 +159,6 @@ map.on("load", () => {
 // Run Womble Button
 let runWombleButton = document.getElementById("run-womble-button");
 runWombleButton.addEventListener("click", async () => {
-  if (!GlobalData.indicatorsData) {
-  }
   await showLoader(true, "Performing wombling");
   // Draw walls if in 3d mode, using buffered source (polygon features)
   runWomble(map, GlobalData.selectedUnbuffered, GlobalData.selectedBuffered);
